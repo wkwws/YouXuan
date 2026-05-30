@@ -1,0 +1,19 @@
+#数据库连接配置
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    url: jdbc:mysql://localhost:3306/secondhand_market
+    password: 123456
+server:
+  port: 8081
+
+secondhand:
+  jwt:
+    secret-key: wangkaiweiwangkaiweiwangkaiweiwangkaiwei
+    ttl-mills: 1700000
+    user-token-name: Authorization
+
+
+
+
