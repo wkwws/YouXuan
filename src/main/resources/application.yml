@@ -1,18 +1,32 @@
 #数据库连接配置
 spring:
+  profiles:
+    active: dev
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     url: jdbc:mysql://localhost:3306/secondhand_market
     password: 123456
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 1
+      password: 123456
 server:
   port: 8081
 
 secondhand:
   jwt:
     secret-key: wangkaiweiwangkaiweiwangkaiweiwangkaiwei
-    ttl-mills: 1700000
+    ttl-mills: 17000000
     user-token-name: Authorization
+
+  alioss:
+    endpoint: ${dev.alioss.endpoint}
+    access-key-id: ${dev.alioss.access-key-id}
+    access-key-secret: ${dev.alioss.access-key-secret}
+    bucket-name: ${dev.alioss.bucket-name}
 
 
 

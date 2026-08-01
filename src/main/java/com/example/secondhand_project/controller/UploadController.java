@@ -1,6 +1,7 @@
 package com.example.secondhand_project.controller;
 
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/upload")
+@Tag(name = "08-文件管理", description = "文件上传记录（预留）")
 public class UploadController {
 
 }

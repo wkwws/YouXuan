@@ -15,7 +15,18 @@ public class WebConf implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-     registry.addInterceptor(interceptor).excludePathPatterns("/auth/**");
-
+     registry.addInterceptor(interceptor).excludePathPatterns( "/auth/**",
+             "/products/{id}",
+             "/categories",
+             // Swagger UI 静态资源（不拦截）
+             "/swagger-ui/**",
+             "/v3/api-docs/**",
+             "/swagger-ui.html");
+//        "/auth/**",uw
+//                "/products",
+//                "/products/{id}",
+//                "/categories",
+//                "/posts"
     }
+
 }

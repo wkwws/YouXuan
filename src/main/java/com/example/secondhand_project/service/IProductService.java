@@ -1,8 +1,10 @@
 package com.example.secondhand_project.service;
 
 import com.example.secondhand_project.pojo.dto.ProductDTO;
+import com.example.secondhand_project.pojo.entity.Pagee;
 import com.example.secondhand_project.pojo.entity.Product;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.example.secondhand_project.pojo.vo.PageVO;
 import com.example.secondhand_project.pojo.vo.ProductVO;
 
 /**
@@ -16,4 +18,10 @@ import com.example.secondhand_project.pojo.vo.ProductVO;
 public interface IProductService extends IService<Product> {
 
     ProductVO addProduct(ProductDTO productDTO);
+
+    PageVO<Product> getAllProduct(Pagee page);
+
+    Product getdetailproduct(Integer id);
+
+    void updateproduct(ProductDTO productDTO, Integer id);
 }

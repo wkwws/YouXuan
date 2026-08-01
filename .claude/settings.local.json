@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(timeout 30 ./mvnw.cmd spring-boot:run)"
+      "Bash(timeout 30 ./mvnw.cmd spring-boot:run)",
+      "Bash(unzip -l \"C:/Users/someo/.m2/repository/com/baomidou/mybatis-plus-extension/3.5.9/mybatis-plus-extension-3.5.9.jar\")"
     ]
   }
 }
