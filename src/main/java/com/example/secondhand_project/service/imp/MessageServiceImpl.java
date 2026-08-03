@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapp
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.toolkit.Db;
 import com.example.secondhand_project.context.BaseContext;
+import com.example.secondhand_project.event.MessageSavedEvent;
 import com.example.secondhand_project.mapper.UserMapper;
 import com.example.secondhand_project.pojo.dto.ConvId;
 import com.example.secondhand_project.pojo.dto.MessageDTO;
@@ -24,8 +25,10 @@ import com.example.secondhand_project.service.IMessageService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.secondhand_project.service.IUserService;
 import com.example.secondhand_project.websocketserver.WebSocketServer;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +53,13 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
 
     @Autowired
     private WebSocketServer webSocketServer;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    /** 事件发布器：用于发布"消息已保存"事件，事务提交后由监听器投递 MQ */
+    @Autowired
+    private ApplicationEventPublisher publisher;
 
 
     @Override
@@ -113,8 +123,28 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         message.setCreatedAt(LocalDateTime.now());
         this.save(message);
         //调用websocket方法，将消息推送的对方用户
-        String jsonString = JSONUtil.toJsonStr(message);
-        webSocketServer.sendToClient(userId,jsonString);
+           //这里我们使用 异步 出入 rabbitmq 中
+        //
+        // ============================================================
+        // 【隐患1 修复方案】
+        // 旧写法：事务内直接投递 MQ
+        //   @Transactional 只管数据库回滚，管不到 RabbitMQ；
+        //   若投递后事务回滚，会出现"推送了但库里没记录"的脏数据。
+        //
+        // 新写法：发布事件，真正投递 MQ 的动作延后到【事务提交成功后】
+        //   由 MessagePushListener(@TransactionalEventListener AFTER_COMMIT) 执行，
+        //   保证"数据库里有，才推送"。
+        // ============================================================
+        // 旧写法（注释保留，供对照）：
+        // String exchange="websocket.exchange";
+        // rabbitTemplate.convertAndSend(exchange,"sendtext",JSONUtil.toJsonStr(message));
+        // String jsonString = JSONUtil.toJsonStr(message);
+        // webSocketServer.sendToClient(userId,jsonString);
+
+        // 新写法：发布事件（事务提交成功后由监听器投递 MQ）
+        publisher.publishEvent(new MessageSavedEvent(message));
+
+
         //构造MessageVO 返回值
           //fromuser信息
         User one = Db.lambdaQuery(User.class)

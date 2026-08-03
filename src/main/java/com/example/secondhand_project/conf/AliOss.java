@@ -9,9 +9,9 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "secondhand.alioss")
 public class AliOss {
 
-    private String endpoint;
-    private String accessKeyId;
-    private String accessKeySecret;
-    private String bucketName;
+    public static String endpoint;
+    public static String accessKeyId;
+    public static String accessKeySecret;
+    public static String bucketName;
 
 }
