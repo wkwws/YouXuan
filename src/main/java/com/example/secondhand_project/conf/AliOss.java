@@ -9,9 +9,11 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "secondhand.alioss")
 public class AliOss {
 
-    public static String endpoint;
-    public static String accessKeyId;
-    public static String accessKeySecret;
-    public static String bucketName;
+//    注意 配置类 不可以 给 static 静态变量赋值
+
+    public  String endpoint;
+    public  String accessKeyId;
+    public  String accessKeySecret;
+    public  String bucketName;
 
 }

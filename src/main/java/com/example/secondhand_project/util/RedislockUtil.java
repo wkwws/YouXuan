@@ -28,7 +28,7 @@ public class RedislockUtil {
      */
     public static boolean getlock(String lockname){
         //通过setnx来构建锁
-        Boolean b = stringRedisTemplate.opsForValue().setIfAbsent(lockname, "1",3L, TimeUnit.SECONDS);
+        Boolean b = stringRedisTemplate.opsForValue().setIfAbsent(lockname, "1",10L, TimeUnit.SECONDS);
         return Boolean.TRUE.equals(b);
 
     }

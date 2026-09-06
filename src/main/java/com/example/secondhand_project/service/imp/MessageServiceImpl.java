@@ -142,6 +142,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         // webSocketServer.sendToClient(userId,jsonString);
 
         // 新写法：发布事件（事务提交成功后由监听器投递 MQ）
+//        TODO 分析 发布事件问题
         publisher.publishEvent(new MessageSavedEvent(message));
 
 

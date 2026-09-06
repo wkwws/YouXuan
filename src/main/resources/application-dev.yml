@@ -1,6 +1,5 @@
 dev:
   alioss:
-
     endpoint: oss-cn-beijing.aliyuncs.com
     access-key-id: LTAI5tQzqfAo2ocAEZX6HRgU
     access-key-secret: LTAI5tQzqfAo2ocAEZX6HRgU

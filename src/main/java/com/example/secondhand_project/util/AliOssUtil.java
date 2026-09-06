@@ -11,30 +11,43 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 
 @Data
-@AllArgsConstructor
+@Component
 @Slf4j
 public class AliOssUtil {
 
+    private static AliOss aliOss;
 
+    @Autowired
+    public void alioss(AliOss aliOss) {
+        AliOssUtil.aliOss = aliOss;
+    }
 
+//    static {
+//
+//    }
 
-
-    // Endpoint以华东1（杭州）为例，其它Region请按实际情况填写。
-    private static String endpoint = AliOss.endpoint;
-    // 从环境变量中获取访问凭证。运行本代码示例之前，请确保已设置环境变量OSS_ACCESS_KEY_ID和OSS_ACCESS_KEY_SECRET。
-    //EnvironmentVariableCredentialsProvider credentialsProvider = CredentialsProviderFactory.newEnvironmentVariableCredentialsProvider();
-    //自定义访问凭证
-    private static   String accessKeyId =  AliOss.accessKeyId;
-    private static String accessKeySecret = AliOss.accessKeySecret;
-    // 填写Bucket名称，例如examplebucket。
-    private static   String bucketName = AliOss.bucketName;
-    // 填写Object完整路径，完整路径中不能包含Bucket名称，例如exampledir/exampleobject.txt。
+//    // Endpoint以华东1（杭州）为例，其它Region请按实际情况填写。
+//    private static String endpoint = aliOss.endpoint;
+//    // 从环境变量中获取访问凭证。运行本代码示例之前，请确保已设置环境变量OSS_ACCESS_KEY_ID和OSS_ACCESS_KEY_SECRET。
+//    //EnvironmentVariableCredentialsProvider credentialsProvider = CredentialsProviderFactory.newEnvironmentVariableCredentialsProvider();
+//    //自定义访问凭证
+//    private static   String accessKeyId =  aliOss.accessKeyId;
+//    private static String accessKeySecret = aliOss.accessKeySecret;
+//    // 填写Bucket名称，例如examplebucket。
+//    private static   String bucketName = aliOss.bucketName;
+//    // 填写Object完整路径，完整路径中不能包含Bucket名称，例如exampledir/exampleobject.txt。
 
     public static String upload(String objectName, InputStream file) throws Exception {
+        String endpoint = aliOss.getEndpoint();
+        String accessKeyId = aliOss.getAccessKeyId();
+        String accessKeySecret = aliOss.getAccessKeySecret();
+        String bucketName = aliOss.getBucketName();
+
         // 填写Bucket所在地域。以华东1（杭州）为例，Region填写为cn-hangzhou。
         String region = "cn-henan";
         // 创建OSSClient实例。

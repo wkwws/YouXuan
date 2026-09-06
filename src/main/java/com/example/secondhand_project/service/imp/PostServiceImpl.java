@@ -119,7 +119,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
             boolean getlock = RedislockUtil.getlock(Post_lock+pagee.getPage());
             if(!getlock){
                 PageVO<PostVO> pageVO = getPageVO(pagee);
-                //如果获取锁失败了，就返回递归
+                //如果获取redis 值失败了，就返回递归
                 if(pageVO==null){
                     return getpost(pagee);
                 }

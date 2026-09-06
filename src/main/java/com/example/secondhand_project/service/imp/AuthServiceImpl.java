@@ -1,6 +1,7 @@
 package com.example.secondhand_project.service.imp;
 
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.secondhand_project.exception.LoginException;
 import com.example.secondhand_project.exception.NullUser;
@@ -12,6 +13,8 @@ import com.example.secondhand_project.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+
+import java.util.List;
 
 @Service
 public class AuthServiceImpl  extends ServiceImpl<AuthMapper,User> implements AuthService {
@@ -42,7 +45,9 @@ public class AuthServiceImpl  extends ServiceImpl<AuthMapper,User> implements Au
             throw new LoginException("密码错误");
         }
         //如果密码正确，就可以返回值了
+
         return user;
+
     }
 
 
@@ -75,4 +80,12 @@ public class AuthServiceImpl  extends ServiceImpl<AuthMapper,User> implements Au
         //这里用到了mybatis-plus
         this.save(user1);
     }
+
+    public void test(){
+
+
+    }
+
+
 }
+
