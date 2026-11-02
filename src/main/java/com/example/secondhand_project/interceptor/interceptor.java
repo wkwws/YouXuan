@@ -41,16 +41,26 @@ public class interceptor implements HandlerInterceptor {
             //所以再检验的时候需要先截取一下
           token = token.substring(7);
         }
-        //从请求头中获取用户信息
-        Claims claims = JwtUtil.parseJWT(jwtConf.getSecretKey(), token);
-        //无法获取则返回401
-        if(claims==null){
+        //从请求头中获取用户信息；过期或非法 token 直接拒绝
+        Claims claims;
+        try {
+            claims = JwtUtil.parseJWT(jwtConf.getSecretKey(), token);
+        } catch (Exception e) {
             response.setStatus(401);
+            return false;
+        }
+        if (claims == null) {
+            response.setStatus(401);
+            return false;
+        }
+        Object id = claims.get("id");
+        if (!(id instanceof Number)) {
+            response.setStatus(401);
+            return false;
         }
 
         //将用户信息存到Threadlocal中
-        //这里之所以使用这样的转换方式是因为claims.get("id")是Integer,与Long为平级关系所以应该先转换成Number大类，然后再转换成Long
-        BaseContext.setCurrentId(((Number)claims.get("id")).longValue());
+        BaseContext.setCurrentId(((Number) id).longValue());
         return true;
     }
 

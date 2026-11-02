@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -67,16 +68,11 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
 
         this.save(post1);
 
-        //构造要删除的key值
-        double count = this.query().count();
-        count=Math.ceil(count/15);
-        int  countt = (int) count;
-        List<String> keys=new ArrayList<>();
-        for(int i=1;i<=countt;i++){
-            keys.add(Post_Key+":"+i);
+        // 读取端 key 为 RedisConstants.Post_Key + page，这里按前缀统一失效
+        Set<String> keys = stringRedisTemplate.keys(RedisConstants.Post_Key + "*");
+        if (keys != null && !keys.isEmpty()) {
+            stringRedisTemplate.delete(keys);
         }
-        //删除redis中post的所有缓存数据
-        stringRedisTemplate.delete(keys);
 
         User byId = iUserService.getById(((Number) currentId).intValue());
 
@@ -104,15 +100,16 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
         //redis 优化方案
         /**
          * 先从redis中获取指定列表，
-         *
-         *
          */
 
         //设计随机过期时间
         long l = RandomUtil.randomLong(30);
 
         pagee.setPage(pagee.getPage()+1);
-        String s = stringRedisTemplate.opsForValue().get(RedisConstants.Post_Key + pagee.getPage());
+
+
+             String s=(stringRedisTemplate.opsForValue().get(RedisConstants.Post_Key + pagee.getPage()));
+
 
         if(s==null){
             //利用分布式锁来解决多线程问题
@@ -133,6 +130,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
                 Page<Post> pp= new  Page<>(pagee.getPage(),pagee.getPageSize());
 
                 Page<Post> page = this.lambdaQuery()
+                        .orderByDesc(Post::getCreatedAt)
                         .page(pp);
 
                 List<Post> records = page.getRecords();
@@ -177,25 +175,17 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
     @Override
     public void deletepost(int id) {
 
-        //先删除数据库中的内容
-        this.removeById(id);
-        //然后根据id值查到他所在的页数
-        Post id1 = this.query().eq("id", id).one();
-        LocalDateTime createdAt = id1.getCreatedAt();
-        Long createdAt1 = this.query().gt("createdAt", createdAt).count();
-        Long count = this.query().count();
-        double countt=count;
-        //总共多少页
-        countt=Math.ceil(countt/15);
-        //需要删除的页数
-        double createdAt2=createdAt1;
-        createdAt2=Math.ceil(createdAt2/15);
-
-        List<String> keys=new ArrayList<>();
-        for(int i=(int)(countt-createdAt2);i<=countt;i++){
-            keys.add(Post_Key+":"+i);
+        Post existing = this.getById(id);
+        if (existing == null) {
+            return;
         }
-        stringRedisTemplate.delete(keys);
+        this.removeById(id);
+
+        // 读取端 key 为 RedisConstants.Post_Key + page，这里按前缀统一失效
+        Set<String> keys = stringRedisTemplate.keys(RedisConstants.Post_Key + "*");
+        if (keys != null && !keys.isEmpty()) {
+            stringRedisTemplate.delete(keys);
+        }
 
     }
 

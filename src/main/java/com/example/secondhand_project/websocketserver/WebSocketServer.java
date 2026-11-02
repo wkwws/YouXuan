@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -49,14 +51,24 @@ public class WebSocketServer {
         log.info("WebSocket 连接请求: userId={}", sid);
 
         // 从查询参数取 token：ws://localhost:8081/ws/1?token=xxx
+        // 兼容 token 不在首位 / 存在其他参数 / URL 编码的情况
         String query = session.getQueryString();
         String token = null;
-        if (query != null && query.startsWith("token=")) {
-            token = query.substring(6);
+        if (query != null) {
+            for (String pair : query.split("&")) {
+                int idx = pair.indexOf('=');
+                if (idx > 0 && "token".equals(pair.substring(0, idx))) {
+                    token = pair.substring(idx + 1);
+                    break;
+                }
+            }
+            if (token != null) {
+                token = URLDecoder.decode(token, StandardCharsets.UTF_8);
+            }
         }
 
         // 校验 token
-        if (token == null || jwtConf == null) {
+        if (token == null || token.isEmpty() || jwtConf == null) {
             log.warn("用户 {} 连接失败：token 为空或配置未注入", sid);
             session.close();
             return;
@@ -64,9 +76,18 @@ public class WebSocketServer {
 
         try {
             Claims claims = JwtUtil.parseJWT(jwtConf.getSecretKey(), token);
-            Integer userId = (Integer) claims.get("id");
+            Object idObj = claims.get("id");
 
-            if (userId == null || !userId.toString().equals(sid)) {
+            // 兼容 Integer / Long / String 等类型；与拦截器 BaseContext 的取法保持一致
+            if (!(idObj instanceof Number)) {
+                log.warn("用户 {} 连接失败：token 中 id 缺失或类型异常", sid);
+                session.close();
+                return;
+            }
+
+            String tokenId = String.valueOf(((Number) idObj).longValue());
+
+            if (!tokenId.equals(sid)) {
                 log.warn("用户 {} 连接失败：token 与 userId 不匹配", sid);
                 session.close();
                 return;

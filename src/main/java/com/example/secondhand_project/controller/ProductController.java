@@ -1,6 +1,7 @@
 package com.example.secondhand_project.controller;
 
 
+import com.example.secondhand_project.context.BaseContext;
 import com.example.secondhand_project.pojo.dto.ProductDTO;
 import com.example.secondhand_project.pojo.entity.Pagee;
 import com.example.secondhand_project.pojo.entity.Product;
@@ -83,6 +84,14 @@ public class ProductController {
     public Result updateproduct(@Parameter(description = "商品 ID") @PathVariable Integer id,
                                 @RequestBody ProductDTO productDTO){
 
+        Product existing = iProductService.getById(id);
+        if (existing == null) {
+            return Result.error("商品不存在");
+        }
+        Long currentId = BaseContext.getCurrentId();
+        if (currentId == null || !currentId.equals(existing.getUid().longValue())) {
+            return Result.error("无权操作该商品");
+        }
         iProductService.updateproduct(productDTO,id);
 
         return Result.success("更新成功");
@@ -97,7 +106,14 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public Result deleteproduct(@Parameter(description = "商品 ID") @PathVariable Integer id){
 
-        //直接调用service层的remove方法就行了
+        Product existing = iProductService.getById(id);
+        if (existing == null) {
+            return Result.error("商品不存在");
+        }
+        Long currentId = BaseContext.getCurrentId();
+        if (currentId == null || !currentId.equals(existing.getUid().longValue())) {
+            return Result.error("无权操作该商品");
+        }
         iProductService.removeById(id);
 
         return Result.success();

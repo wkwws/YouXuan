@@ -2,6 +2,7 @@ package com.example.secondhand_project.controller;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.secondhand_project.context.BaseContext;
 import com.example.secondhand_project.pojo.dto.PostDTO;
 import com.example.secondhand_project.pojo.entity.Pagee;
 import com.example.secondhand_project.pojo.entity.Post;
@@ -76,10 +77,15 @@ public class PostController {
     @DeleteMapping("/{id}")
     public Result deletepost(@Parameter(description = "说说 ID") @PathVariable int id){
 
-        //直接调用service层中的方法
-
+        Post existing = iPostService.getById(id);
+        if (existing == null) {
+            return Result.error("说说不存在");
+        }
+        Long currentId = BaseContext.getCurrentId();
+        if (currentId == null || !currentId.equals(existing.getUid().longValue())) {
+            return Result.error("无权删除该说说");
+        }
         iPostService.deletepost(id);
-
 
         return Result.success("删除成功");
     }

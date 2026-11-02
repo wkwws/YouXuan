@@ -3,6 +3,7 @@ package com.example.secondhand_project.pojo.entity;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
@@ -62,6 +63,7 @@ public class User implements Serializable {
     /**
      * 密码（bcrypt 哈希）
      */
+    @JsonIgnore
     @Schema(description = "密码（bcrypt 哈希，响应中不返回）")
     private String pwd;
 
