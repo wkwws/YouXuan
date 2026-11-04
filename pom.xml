@@ -36,6 +36,12 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!-- 参数校验：@Valid / @NotNull（点赞表单使用） -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
         <!-- mybatis-plus-spring-boot3-starter 是 MyBatis-Plus 针对 Spring Boot 3.x 的专用包
              内部使用 mybatis-spring:3.x（与 Spring Boot 3.3.x 兼容），替换旧的
              mybatis-plus-boot-starter:3.5.5（内部使用 mybatis-spring:2.1.2 不兼容） -->

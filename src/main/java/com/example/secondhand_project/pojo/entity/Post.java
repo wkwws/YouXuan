@@ -54,6 +54,12 @@ public class Post implements Serializable {
     private List<String> images;
 
     /**
+     * 点赞总数
+     */
+    @TableField("like_count")
+    private Integer likeCount;
+
+    /**
      * 发布时间
      */
     @TableField("created_at")

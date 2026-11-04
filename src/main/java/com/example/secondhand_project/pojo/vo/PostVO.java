@@ -35,6 +35,9 @@ public class PostVO {
     @Schema(description = "图片URL列表")
     private List<String> images;
 
+    @Schema(description = "点赞总数")
+    private Integer likeCount;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Schema(description = "发布时间")
     private LocalDateTime createdAt;

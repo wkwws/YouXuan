@@ -8,4 +8,12 @@ public class RedisConstants {
 
     public static final String Post_lock="Lock:post";
 
+    // ==================== 点赞模块（融合 点赞功能模板/tj-remark） ====================
+
+    /** 某个业务对象下的点赞用户集合：like:record:biz:{bizId} */
+    public static final String LIKE_RECORD_BIZ = "like:record:biz:";
+
+    /** 待同步的点赞计数 ZSet：like:record:count:{bizType} */
+    public static final String LIKE_RECORD_COUNT = "like:record:count:";
+
 }

@@ -65,6 +65,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
         Long currentId = BaseContext.getCurrentId();
 
         post1.setUid(((Number)currentId).intValue());
+        post1.setLikeCount(0);
 
         this.save(post1);
 
@@ -85,6 +86,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
                 .avatar(byId.getAvatar())
                 .content(post1.getContent())
                 .images(post1.getImages())
+                .likeCount(0)
                 .createdAt(LocalDateTime.now())
                 .build();
 
