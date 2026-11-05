@@ -22,8 +22,8 @@ import java.util.List;
 @Slf4j
 public class LikeCountSyncJob {
 
-    // 评论点赞接入后，把 LikeBizTypeEnum.COMMENT 加进来即可
-    private static final List<LikeBizTypeEnum> BIZ_TYPES = List.of(LikeBizTypeEnum.POST);
+    private static final List<LikeBizTypeEnum> BIZ_TYPES =
+            List.of(LikeBizTypeEnum.POST, LikeBizTypeEnum.COMMENT);
 
     private static final int MAX_BIZ_COUNT = 30;
 

@@ -8,6 +8,14 @@ public class RedisConstants {
 
     public static final String Post_lock="Lock:post";
 
+    // ==================== 说说大厅 ====================
+
+    /** 大厅最新 10 条说说的缓存（只缓存内容，liked 由每次请求按用户叠加） */
+    public static final String FEED_POST_LATEST = "feed:post:latest";
+
+    /** 重建大厅缓存的互斥锁 */
+    public static final String FEED_POST_LOCK = "lock:feed:post";
+
     // ==================== 点赞模块（融合 点赞功能模板/tj-remark） ====================
 
     /** 某个业务对象下的点赞用户集合：like:record:biz:{bizId} */

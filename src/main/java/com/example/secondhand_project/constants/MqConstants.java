@@ -19,6 +19,9 @@ public class MqConstants {
     public static class Queue {
         /** 说说点赞计数队列 */
         public static final String LIKE_RECORD_QUEUE_POST = "like.record.queue.post";
+
+        /** 评论点赞计数队列 */
+        public static final String LIKE_RECORD_QUEUE_COMMENT = "like.record.queue.comment";
     }
 
     public static class Key {
@@ -27,6 +30,9 @@ public class MqConstants {
 
         /** 说说点赞 routing key（与 LikeBizTypeEnum.POST 的枚举名保持一致） */
         public static final String LIKED_TIMES_KEY_POST = "like.record.times.POST";
+
+        /** 评论点赞 routing key（与 LikeBizTypeEnum.COMMENT 的枚举名保持一致） */
+        public static final String LIKED_TIMES_KEY_COMMENT = "like.record.times.COMMENT";
     }
 
 }

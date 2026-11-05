@@ -1,5 +1,6 @@
 package com.example.secondhand_project.handler;
 
+import com.example.secondhand_project.exception.BusinessException;
 import com.example.secondhand_project.exception.LoginException;
 import com.example.secondhand_project.exception.NullUser;
 import com.example.secondhand_project.exception.RegisterException;
@@ -13,7 +14,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({LoginException.class, NullUser.class, RegisterException.class})
+    @ExceptionHandler({
+            LoginException.class,
+            NullUser.class,
+            RegisterException.class,
+            BusinessException.class
+    })
     public Result<Void> handleBusiness(RuntimeException e) {
         return Result.error(e.getMessage());
     }

@@ -61,7 +61,10 @@ public class LikedRedisRecordServiceImpl extends ServiceImpl<LikedRecordMapper, 
             throw new LoginException("请先登录");
         }
 
-        String bizKey = RedisConstants.LIKE_RECORD_BIZ + likeRecordFormDTO.getBizId();
+        // 用 bizType 命名空间隔离，避免 post#12 和 comment#12 共用同一个 Set
+        String bizKey = RedisConstants.LIKE_RECORD_BIZ
+                + likeRecordFormDTO.getBizType().name() + ":"
+                + likeRecordFormDTO.getBizId();
         boolean liked = Boolean.TRUE.equals(likeRecordFormDTO.getLiked());
 
         if (liked) {
@@ -92,8 +95,8 @@ public class LikedRedisRecordServiceImpl extends ServiceImpl<LikedRecordMapper, 
     }
 
     @Override
-    public List<Long> showUserLike(List<Long> bizIds) {
-        if (bizIds == null || bizIds.isEmpty()) {
+    public List<Long> showUserLike(LikeBizTypeEnum bizType, List<Long> bizIds) {
+        if (bizType == null || bizIds == null || bizIds.isEmpty()) {
             return Collections.emptyList();
         }
         Long userId = BaseContext.getCurrentId();
@@ -107,7 +110,7 @@ public class LikedRedisRecordServiceImpl extends ServiceImpl<LikedRecordMapper, 
             public Object doInRedis(RedisConnection connection) throws DataAccessException {
                 StringRedisConnection stringRedisConnection = (StringRedisConnection) connection;
                 for (Long bizId : bizIds) {
-                    String key = RedisConstants.LIKE_RECORD_BIZ + bizId;
+                    String key = RedisConstants.LIKE_RECORD_BIZ + bizType.name() + ":" + bizId;
                     stringRedisConnection.sIsMember(key, userId.toString());
                 }
                 return null;

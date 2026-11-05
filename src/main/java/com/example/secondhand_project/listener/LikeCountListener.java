@@ -1,7 +1,6 @@
 package com.example.secondhand_project.listener;
 
 import com.example.secondhand_project.constants.MqConstants;
-import com.example.secondhand_project.constants.RedisConstants;
 import com.example.secondhand_project.enums.LikeBizTypeEnum;
 import com.example.secondhand_project.pojo.dto.LikeCountMessage;
 import com.example.secondhand_project.pojo.dto.LikedTimesDTO;
@@ -14,10 +13,7 @@ import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
-
-import java.util.Set;
 
 /**
  * 点赞计数消费端：把 MQ 里的“绝对点赞数”写回 post.like_count。
@@ -33,8 +29,6 @@ import java.util.Set;
 public class LikeCountListener {
 
     private final IPostService postService;
-
-    private final StringRedisTemplate stringRedisTemplate;
 
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue(name = MqConstants.Queue.LIKE_RECORD_QUEUE_POST, durable = "true"),
@@ -68,11 +62,8 @@ public class LikeCountListener {
         }
 
         if (changed) {
-            // 列表缓存里带的是旧计数，计数落库后统一失效，下次请求重建
-            Set<String> keys = stringRedisTemplate.keys(RedisConstants.Post_Key + "*");
-            if (keys != null && !keys.isEmpty()) {
-                stringRedisTemplate.delete(keys);
-            }
+            // 大厅缓存里带的是旧计数，计数落库后统一失效，下次请求重建
+            postService.evictFeedCache();
         }
 
         log.info("点赞计数落库完成, bizType={}, size={}", message.getBizType(), message.getList().size());

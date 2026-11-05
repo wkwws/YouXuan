@@ -24,9 +24,9 @@ public interface ILikedRecordService extends IService<LikedRecord> {
     Long addordeleteRecord(LikeRecordFormDTO likeRecordFormDTO);
 
     /**
-     * 查询当前用户在上述业务对象中已经点赞的 ID 列表。
+     * 查询当前用户在指定业务类型下已经点赞的 ID 列表。
      */
-    List<Long> showUserLike(List<Long> bizIds);
+    List<Long> showUserLike(LikeBizTypeEnum bizType, List<Long> bizIds);
 
     /**
      * 从 ZSet 中弹出一批计数并通过 MQ 发给业务侧落库。

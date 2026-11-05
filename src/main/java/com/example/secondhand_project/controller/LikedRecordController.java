@@ -1,5 +1,6 @@
 package com.example.secondhand_project.controller;
 
+import com.example.secondhand_project.enums.LikeBizTypeEnum;
 import com.example.secondhand_project.pojo.dto.LikeRecordFormDTO;
 import com.example.secondhand_project.result.Result;
 import com.example.secondhand_project.service.ILikedRecordService;
@@ -44,9 +45,11 @@ public class LikedRecordController {
     @Operation(summary = "查询当前用户已点赞的业务ID列表", description = "前端拿到列表后用于点亮爱心")
     @GetMapping("/list")
     public Result<List<Long>> showUserLike(
+            @Parameter(description = "业务类型：POST=说说，COMMENT=评论", example = "POST")
+            @RequestParam(value = "bizType", defaultValue = "POST") LikeBizTypeEnum bizType,
             @Parameter(description = "业务ID列表，逗号分隔", example = "1,2,3")
             @RequestParam("bizIds") List<Long> bizIds) {
-        return Result.success(likedRecordService.showUserLike(bizIds));
+        return Result.success(likedRecordService.showUserLike(bizType, bizIds));
     }
 
 }

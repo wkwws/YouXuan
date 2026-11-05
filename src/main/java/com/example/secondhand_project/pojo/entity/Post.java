@@ -60,6 +60,12 @@ public class Post implements Serializable {
     private Integer likeCount;
 
     /**
+     * 评论总数（含子评论）
+     */
+    @TableField("comment_count")
+    private Integer commentCount;
+
+    /**
      * 发布时间
      */
     @TableField("created_at")

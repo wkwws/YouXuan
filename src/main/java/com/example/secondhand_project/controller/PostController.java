@@ -1,12 +1,9 @@
 package com.example.secondhand_project.controller;
 
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.secondhand_project.context.BaseContext;
 import com.example.secondhand_project.pojo.dto.PostDTO;
-import com.example.secondhand_project.pojo.entity.Pagee;
 import com.example.secondhand_project.pojo.entity.Post;
-import com.example.secondhand_project.pojo.vo.PageVO;
 import com.example.secondhand_project.pojo.vo.PostVO;
 import com.example.secondhand_project.result.Result;
 import com.example.secondhand_project.service.IPostService;
@@ -14,8 +11,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * <p>
@@ -32,9 +30,6 @@ public class PostController {
 
     @Autowired
     private IPostService iPostService;
-
-    @Autowired
-    private StringRedisTemplate stringRedisTemplate;
 
 
     //TODO redis 优化方案
@@ -54,16 +49,13 @@ public class PostController {
 
 
     /**
-     * 获取说说列表
+     * 获取说说列表：无参数，默认最新 10 条
      * @return
      */
-    @Operation(summary = "获取说说列表", description = "分页获取所有校园说说")
+    @Operation(summary = "获取说说列表", description = "无参数，一次返回最新 10 条说说")
     @GetMapping
-    public Result getpost(Pagee pagee){
-
-        PageVO<PostVO> po= iPostService.getpost(pagee);
-
-        return Result.success(po);
+    public Result<List<PostVO>> getpost() {
+        return Result.success(iPostService.listLatest());
     }
 
 
