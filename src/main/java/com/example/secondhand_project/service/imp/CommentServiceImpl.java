@@ -26,6 +26,8 @@ import com.example.secondhand_project.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization; // 事务回调接口
+import org.springframework.transaction.support.TransactionSynchronizationManager; // 事务同步管理器，用来注册“提交后执行”
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -155,7 +157,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
                 .eq(Post::getId, postId)
                 .setSql("comment_count = comment_count + 1")
                 .update();
-        postService.evictFeedCache();
+        evictFeedPostAfterCommit(postId); // 评论数变了，事务提交后删这条帖子的快照
 
         User author = userService.getById(uid.intValue());
         return CommentVO.builder()
@@ -246,7 +248,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
                 .eq(Post::getId, comment.getPostId())
                 .setSql("comment_count = comment_count + 1")
                 .update();
-        postService.evictFeedCache();
+        evictFeedPostAfterCommit(comment.getPostId()); // 回复数/评论数变了，事务提交后删快照
 
         Set<Integer> ids = new HashSet<>();
         ids.add(uid.intValue());
@@ -289,7 +291,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
                 .eq(Post::getId, comment.getPostId())
                 .setSql("comment_count = GREATEST(comment_count - " + delta + ", 0)")
                 .update();
-        postService.evictFeedCache();
+        evictFeedPostAfterCommit(comment.getPostId()); // 评论数减少，事务提交后删快照
     }
 
     @Override
@@ -325,7 +327,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
                 .eq(Post::getId, comment.getPostId())
                 .setSql("comment_count = GREATEST(comment_count - 1, 0)")
                 .update();
-        postService.evictFeedCache();
+        evictFeedPostAfterCommit(comment.getPostId()); // 子评论删除，评论数减少，事务提交后删快照
     }
 
     private Long currentUid() {
@@ -334,6 +336,22 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             throw new LoginException("请先登录");
         }
         return uid;
+    }
+
+    /**
+     * 事务提交后再失效快照，避免并发 Feed 读到提交前的旧评论数并缓存下来。
+     */
+    private void evictFeedPostAfterCommit(int postId) { // 评论数变化后，删这条帖子的内容缓存
+        if (TransactionSynchronizationManager.isSynchronizationActive()) { // 当前有事务
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() { // 注册事务回调
+                @Override
+                public void afterCommit() { // 事务提交成功后
+                    postService.evictFeedPost(postId); // 再删快照，避免并发读缓存旧数据
+                }
+            });
+        } else { // 没有事务
+            postService.evictFeedPost(postId); // 立即删
+        }
     }
 
     private String normalizeContent(String content) {

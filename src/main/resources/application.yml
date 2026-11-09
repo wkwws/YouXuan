@@ -43,6 +43,23 @@ secondhand:
     access-key-secret: ${dev.alioss.access-key-secret}
     bucket-name: ${dev.alioss.bucket-name}
 
+# 说说随机 Feed：权重 = 基础分 + 时间衰减 + 点赞对数 + 新帖加成
+feed:
+  size: 10 # 服务层默认条数（当前接口由 Controller 的 defaultValue=10 提供，配置项预留）
+  max-size: 20 # 一次最多返回 20 条，防止 size=99999 拖垮服务
+  page-size: 10 # 每个随机页放 10 个帖子 ID
+  page-count-max: 500 # 最多预生成 500 页，控制 Redis 内存
+  candidate-days: 30 # 只拿最近 30 天的帖子参与随机
+  candidate-max: 5000 # 一次最多查 5000 条候选
+  half-life-hours: 36 # 时间衰减半衰期：约 36 小时后时间分降到 37%
+  recency-weight: 4.0 # 时间分权重，越大新帖越容易冒头
+  like-weight: 1.5 # 点赞分权重，越大高赞帖越容易冒头
+  new-post-hours: 2 # 发布 2 小时内算新帖
+  new-post-boost: 2.0 # 新帖额外加 2 分
+  max-weight: 20.0 # 单条权重封顶，防止爆款霸屏
+  snapshot-ttl-seconds: 300 # 单条说说内容缓存 5 分钟
+  snapshot-ttl-random: 60 # 再随机加 0~60 秒，避免大量缓存同时过期
+
 
 
 

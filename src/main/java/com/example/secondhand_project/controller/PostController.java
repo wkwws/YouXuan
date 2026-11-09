@@ -1,19 +1,24 @@
-package com.example.secondhand_project.controller;
+package com.example.secondhand_project.controller; // 控制器所在的包
 
 
-import com.example.secondhand_project.context.BaseContext;
-import com.example.secondhand_project.pojo.dto.PostDTO;
-import com.example.secondhand_project.pojo.entity.Post;
-import com.example.secondhand_project.pojo.vo.PostVO;
-import com.example.secondhand_project.result.Result;
-import com.example.secondhand_project.service.IPostService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import com.example.secondhand_project.context.BaseContext; // 当前登录用户 ID
+import com.example.secondhand_project.pojo.dto.PostDTO; // 发布说说的请求体
+import com.example.secondhand_project.pojo.entity.Post; // 说说实体
+import com.example.secondhand_project.pojo.vo.PostVO; // 返回给前端的说说
+import com.example.secondhand_project.result.Result; // 统一返回格式
+import com.example.secondhand_project.service.IFeedService; // 随机 Feed 服务
+import com.example.secondhand_project.service.IPostService; // 说说基础服务
+import io.swagger.v3.oas.annotations.Operation; // Swagger 接口说明
+import io.swagger.v3.oas.annotations.Parameter; // Swagger 参数说明
+import io.swagger.v3.oas.annotations.tags.Tag; // Swagger 分组
+import org.springframework.beans.factory.annotation.Autowired; // 自动注入
+import org.springframework.web.bind.annotation.*; // Spring MVC 注解
 
-import java.util.List;
+import java.util.Arrays; // 拆分 exclude 字符串
+import java.util.Collections; // 返回空列表
+import java.util.List; // 返回多条说说
+import java.util.Objects; // 过滤空值
+import java.util.stream.Collectors; // 把流转成 List
 
 /**
  * <p>
@@ -23,63 +28,91 @@ import java.util.List;
  * @author wkw
  * @since 2026-05-31
  */
-@RestController
-@RequestMapping("/posts")
-@Tag(name = "05-说说管理（校园生活圈）", description = "校园说说的增删查")
+@RestController // 返回 JSON
+@RequestMapping("/posts") // 所有接口以 /posts 开头
+@Tag(name = "05-说说管理（校园生活圈）", description = "校园说说的增删查") // Swagger 分组
 public class PostController {
 
-    @Autowired
+    @Autowired // 注入说说服务
     private IPostService iPostService;
 
+    @Autowired // 注入随机 Feed 服务
+    private IFeedService feedService;
 
-    //TODO redis 优化方案
+
     /**
      * 添加说说
-     * @param post
-     * @return
-     */
-    @Operation(summary = "发布说说", description = "发布一条校园生活说说（需登录）")
-    @PostMapping()
-    public Result addpost(@RequestBody PostDTO post) {
-
-        PostVO addpost = iPostService.addpost(post);
-
-        return Result.success(addpost);
-    }
-
-
-    /**
-     * 获取说说列表：无参数，默认最新 10 条
-     * @return
-     */
-    @Operation(summary = "获取说说列表", description = "无参数，一次返回最新 10 条说说")
-    @GetMapping
-    public Result<List<PostVO>> getpost() {
-        return Result.success(iPostService.listLatest());
-    }
-
-
-    /**
      *
-     * 删除说说
-     * @param id
-     * @return
+     * @param post 说说内容
      */
-    @Operation(summary = "删除说说", description = "根据 ID 删除说说（需登录，仅自己的说说）")
-    @DeleteMapping("/{id}")
-    public Result deletepost(@Parameter(description = "说说 ID") @PathVariable int id){
+    @Operation(summary = "发布说说", description = "发布一条校园生活说说（需登录）") // Swagger 说明
+    @PostMapping() // POST /posts
+    public Result addpost(@RequestBody PostDTO post) { // 前端传来的 content/images
 
-        Post existing = iPostService.getById(id);
-        if (existing == null) {
-            return Result.error("说说不存在");
-        }
-        Long currentId = BaseContext.getCurrentId();
-        if (currentId == null || !currentId.equals(existing.getUid().longValue())) {
-            return Result.error("无权删除该说说");
-        }
-        iPostService.deletepost(id);
+        PostVO addpost = iPostService.addpost(post); // 真正保存说说；内部会失效随机池
 
-        return Result.success("删除成功");
+        return Result.success(addpost); // 返回新说说
+    }
+
+
+    /**
+     * 随机获取说说：默认 10 条，可选 size 和 exclude。
+     *
+     * <p>exclude 传上一批的 ID，用于“换一批”尽量不重复。</p>
+     */
+    @Operation(summary = "随机获取说说列表",
+            description = "按时间 + 点赞加权随机返回，默认 10 条；exclude 传上一批 ID 可减少重复")
+    @GetMapping // GET /posts
+    public Result<List<PostVO>> getpost(
+            @Parameter(description = "返回条数，默认 10，最大 20")
+            @RequestParam(value = "size", required = false, defaultValue = "10") Integer size, // 前端要几条
+            @Parameter(description = "上一批说说 ID，逗号分隔")
+            @RequestParam(value = "exclude", required = false) String exclude) { // 上一批的 ID
+        int limit = size == null ? 10 : size; // size 没传就按 10 条
+        return Result.success(feedService.randomFeed(limit, parseExclude(exclude))); // 随机取一页并返回
+    }
+
+    /**
+     * 把 "1,2,3" 解析成 [1,2,3]。
+     */
+    private List<Integer> parseExclude(String exclude) { // 解析前端传来的上一批 ID
+        if (exclude == null || exclude.isBlank()) { // 没传或空字符串
+            return Collections.emptyList(); // 返回空列表
+        }
+        return Arrays.stream(exclude.split(",")) // 按逗号拆开
+                .map(String::trim) // 去掉每个 ID 两边的空格
+                .filter(value -> !value.isEmpty()) // 过滤空字符串
+                .limit(50) // 最多处理 50 个，防止参数太长
+                .map(value -> { // 把字符串转成整数
+                    try { // 正常数字
+                        return Integer.valueOf(value); // 转成 Integer
+                    } catch (NumberFormatException e) { // 不是数字
+                        return null; // 先标记成 null
+                    }
+                })
+                .filter(Objects::nonNull) // 丢掉不是数字的项
+                .collect(Collectors.toList()); // 收集成 List
+    }
+
+
+    /**
+     * 删除说说
+     */
+    @Operation(summary = "删除说说", description = "根据 ID 删除说说（需登录，仅自己的说说）") // Swagger 说明
+    @DeleteMapping("/{id}") // DELETE /posts/{id}
+    public Result deletepost(@Parameter(description = "说说 ID") @PathVariable int id) { // 路径里的说说 ID
+
+        Post existing = iPostService.getById(id); // 先查这条说说在不在
+        if (existing == null) { // 不存在
+            return Result.error("说说不存在"); // 返回错误
+        }
+        Long currentId = BaseContext.getCurrentId(); // 当前登录用户
+        if (currentId == null || !currentId.equals(existing.getUid().longValue())) { // 没登录或不是作者
+            return Result.error("无权删除该说说"); // 返回无权限
+        }
+        iPostService.deletepost(id); // 真正删除；内部会在事务提交后失效缓存
+
+        return Result.success("删除成功"); // 返回成功
     }
 
 

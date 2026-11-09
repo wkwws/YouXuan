@@ -1,43 +1,32 @@
-package com.example.secondhand_project.service.imp;
+package com.example.secondhand_project.service.imp; // 服务实现所在的包
 
-import cn.hutool.core.util.RandomUtil;
-import cn.hutool.json.JSONUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.example.secondhand_project.constants.RedisConstants;
-import com.example.secondhand_project.context.BaseContext;
-import com.example.secondhand_project.enums.LikeBizTypeEnum;
-import com.example.secondhand_project.mapper.CommentMapper;
-import com.example.secondhand_project.mapper.PostMapper;
-import com.example.secondhand_project.mapper.SubCommentMapper;
-import com.example.secondhand_project.pojo.dto.PostDTO;
-import com.example.secondhand_project.pojo.entity.Comment;
-import com.example.secondhand_project.pojo.entity.Post;
-import com.example.secondhand_project.pojo.entity.SubComment;
-import com.example.secondhand_project.pojo.entity.User;
-import com.example.secondhand_project.pojo.vo.PostVO;
-import com.example.secondhand_project.service.ILikedRecordService;
-import com.example.secondhand_project.service.IPostService;
-import com.example.secondhand_project.service.IUserService;
-import com.example.secondhand_project.util.RedislockUtil;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper; // 构造查询条件
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper; // 构造更新条件
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl; // MyBatis-Plus 基础服务
+import com.example.secondhand_project.context.BaseContext; // 当前登录用户 ID
+import com.example.secondhand_project.mapper.CommentMapper; // 评论表
+import com.example.secondhand_project.mapper.PostMapper; // 说说表
+import com.example.secondhand_project.mapper.SubCommentMapper; // 子评论表
+import com.example.secondhand_project.pojo.dto.PostDTO; // 发布说说请求
+import com.example.secondhand_project.pojo.entity.Comment; // 评论实体
+import com.example.secondhand_project.pojo.entity.Post; // 说说实体
+import com.example.secondhand_project.pojo.entity.SubComment; // 子评论实体
+import com.example.secondhand_project.pojo.entity.User; // 用户实体
+import com.example.secondhand_project.pojo.vo.PostVO; // 返回给前端的说说
+import com.example.secondhand_project.service.IFeedPoolService; // 随机池服务
+import com.example.secondhand_project.service.IPostService; // 说说服务接口
+import com.example.secondhand_project.service.IUserService; // 用户服务
+import lombok.RequiredArgsConstructor; // 自动生成构造器
+import lombok.extern.slf4j.Slf4j; // 自动生成 log
+import org.springframework.beans.BeanUtils; // 拷贝对象属性
+import org.springframework.stereotype.Service; // 服务注解
+import org.springframework.transaction.annotation.Transactional; // 事务注解
+import org.springframework.transaction.support.TransactionSynchronization; // 事务回调
+import org.springframework.transaction.support.TransactionSynchronizationManager; // 判断是否有事务
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+import java.time.LocalDateTime; // 当前时间
+import java.util.List; // 多条评论
+import java.util.stream.Collectors; // 流转 List
 
 /**
  * <p>
@@ -47,229 +36,99 @@ import java.util.stream.Collectors;
  * @author wkw
  * @since 2026-05-31
  */
-@Service
-@RequiredArgsConstructor
-@Slf4j
-public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IPostService {
+@Service // 交给 Spring 管理
+@RequiredArgsConstructor // 自动生成构造器，注入 final 字段
+@Slf4j // 自动生成 log
+public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IPostService { // 继承基础 CRUD，实现自定义方法
 
-    /**
-     * 大厅一次返回 10 条，后续换成推荐/随机召回时改这里即可
-     */
-    private static final int FEED_LIMIT = 10;
+    private final IUserService iUserService; // 查作者信息
 
-    private static final long FEED_TTL_SECONDS = 60;
+    private final IFeedPoolService feedPoolService; // 失效随机池/单条快照
 
-    private static final long FEED_TTL_RANDOM = 20;
+    private final CommentMapper commentMapper; // 删帖时处理评论
 
-    private final IUserService iUserService;
-
-    private final StringRedisTemplate stringRedisTemplate;
-
-    private final ILikedRecordService likedRecordService;
-
-    private final CommentMapper commentMapper;
-
-    private final SubCommentMapper subCommentMapper;
-
-    private final ObjectMapper objectMapper;
+    private final SubCommentMapper subCommentMapper; // 删帖时处理子评论
 
     @Override
-    public PostVO addpost(PostDTO post) {
-        Post post1 = new Post();
-        BeanUtils.copyProperties(post, post1);
+    public PostVO addpost(PostDTO post) { // 发布说说
+        Post post1 = new Post(); // 创建数据库实体
+        BeanUtils.copyProperties(post, post1); // 把前端传来的 content/images 拷进去
 
-        Long currentId = BaseContext.getCurrentId();
-        post1.setUid(((Number) currentId).intValue());
-        post1.setLikeCount(0);
-        post1.setCommentCount(0);
+        Long currentId = BaseContext.getCurrentId(); // 当前登录用户 ID
+        post1.setUid(((Number) currentId).intValue()); // 设置作者
+        post1.setLikeCount(0); // 新帖点赞数从 0 开始
+        post1.setCommentCount(0); // 新帖评论数从 0 开始
 
-        this.save(post1);
-        evictFeedCache();
+        this.save(post1); // 插入 post 表
+        // 发帖不重建随机池：等下一次 60 秒定时重建自然纳入，
+        // 避免高并发发帖时反复删除随机页、造成缓存抖动和数据库回源。
 
-        User byId = iUserService.getById(((Number) currentId).intValue());
-        return PostVO.builder()
-                .id(post1.getId())
-                .uid(post1.getUid())
-                .username(byId.getUsername())
-                .nickname(byId.getNickname())
-                .avatar(byId.getAvatar())
-                .content(post1.getContent())
-                .images(post1.getImages())
-                .likeCount(0)
-                .commentCount(0)
-                .liked(false)
-                .createdAt(LocalDateTime.now())
-                .build();
+
+        User byId = iUserService.getById(((Number) currentId).intValue()); // 查作者信息
+        return PostVO.builder() // 组装返回给前端的对象
+                .id(post1.getId()) // 说说 ID
+                .uid(post1.getUid()) // 作者 ID
+                .username(byId.getUsername()) // 用户名
+                .nickname(byId.getNickname()) // 昵称
+                .avatar(byId.getAvatar()) // 头像
+                .content(post1.getContent()) // 内容
+                .images(post1.getImages()) // 图片
+                .likeCount(0) // 点赞数
+                .commentCount(0) // 评论数
+                .liked(false) // 当前用户还没点赞
+                .createdAt(LocalDateTime.now()) // 发布时间
+                .build(); // 构造完成
     }
 
     @Override
-    public List<PostVO> listLatest() {
-        String json = stringRedisTemplate.opsForValue().get(RedisConstants.FEED_POST_LATEST);
-        List<PostVO> list = readCache(json);
-        if (list == null) {
-            //没有查到的话，尝试获取锁然后找数据库
-            list = loadLatestFromDbWithLock();
-        }
-        fillLiked(list);
-        return list;
-    }
-
-    private List<PostVO> loadLatestFromDbWithLock() {
-        /**
-         * 这个函数主要是第一次没有从缓存中获取到说说的后操作， 获取 需要查的说说 消息，
-         * 先通过获取分布式锁，获取不到就进入循环，20次循环 ，每次循环都会尝试获取缓存中的数据
-         * 如果20次循环后，还没有从redis 中获取到缓存，就会 从数据库总获取
-         * 如果获取到锁，就从数据库总获取说说的信息，然后 存储到redis 中，最后释放锁
-         * 整体流程还是可以看懂的
-         */
-
-        if (!RedislockUtil.getlock(RedisConstants.FEED_POST_LOCK)) {
-            // 其他线程正在重建缓存，短暂等待；仍拿不到就降级直接查库
-            for (int i = 0; i < 20; i++) {
-                String cached = stringRedisTemplate.opsForValue().get(RedisConstants.FEED_POST_LATEST);
-                List<PostVO> cachedList = readCache(cached);
-                if (cachedList != null) {
-                    return cachedList;
-                }
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    break;
-                }
-            }
-            return loadLatestFromDb();
-        }
-
-        try {
-            // 双重检查：拿到锁之后可能别的线程已经写好了缓存
-            String cached = stringRedisTemplate.opsForValue().get(RedisConstants.FEED_POST_LATEST);
-            List<PostVO> cachedList = readCache(cached);
-            if (cachedList != null) {
-                return cachedList;
-            }
-
-            List<PostVO> list = loadLatestFromDb();
-            long ttl = FEED_TTL_SECONDS + RandomUtil.randomLong(FEED_TTL_RANDOM);
-            writeCache(list, ttl);
-            return list;
-        } finally {
-            RedislockUtil.unlock(RedisConstants.FEED_POST_LOCK);
-        }
-    }
-
-    private List<PostVO> loadLatestFromDb() {
-        List<Post> posts = this.lambdaQuery()
-                .orderByDesc(Post::getCreatedAt)
-                .last("LIMIT " + FEED_LIMIT)
-                .list();
-        if (posts.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        Set<Integer> uids = posts.stream().map(Post::getUid).collect(Collectors.toSet());
-        Map<Integer, User> userMap = iUserService.listByIds(uids).stream()
-                .collect(Collectors.toMap(User::getId, u -> u, (a, b) -> a));
-
-        return posts.stream().map(p -> {
-            User author = userMap.get(p.getUid());
-            return PostVO.builder()
-                    .id(p.getId())
-                    .uid(p.getUid())
-                    .username(author == null ? "" : author.getUsername())
-                    .nickname(author == null ? "" : author.getNickname())
-                    .avatar(author == null ? "" : author.getAvatar())
-                    .content(p.getContent())
-                    .images(p.getImages())
-                    .likeCount(p.getLikeCount() == null ? 0 : p.getLikeCount())
-                    .commentCount(p.getCommentCount() == null ? 0 : p.getCommentCount())
-                    .liked(false)
-                    .createdAt(p.getCreatedAt())
-                    .build();
-        }).collect(Collectors.toList());
-    }
-
-    private void fillLiked(List<PostVO> list) {
-        if (list == null || list.isEmpty()) {
-            return;
-        }
-        Long uid = BaseContext.getCurrentId();
-        if (uid == null) {
-            list.forEach(p -> p.setLiked(false));
-            return;
-        }
-
-        List<Long> ids = list.stream()
-                .map(p -> p.getId().longValue())
-                .collect(Collectors.toList());
-        Set<Long> likedSet = new HashSet<>(
-                likedRecordService.showUserLike(LikeBizTypeEnum.POST, ids)
-        );
-        list.forEach(p -> p.setLiked(likedSet.contains(p.getId().longValue())));
-    }
-
-    @Override
-    @Transactional
-    public void deletepost(int id) {
-        Post existing = this.getById(id);
-        if (existing == null) {
-            return;
+    @Transactional // 删帖涉及多张表，放在一个事务里
+    public void deletepost(int id) { // 删除说说
+        Post existing = this.getById(id); // 先查帖子是否存在
+        if (existing == null) { // 不存在
+            return; // 直接返回
         }
 
         // 删除说说时级联软删除它下面的评论和子评论，避免留下孤儿数据
-        List<Long> commentIds = commentMapper.selectList(
-                        new LambdaQueryWrapper<Comment>().eq(Comment::getPostId, id)
-                ).stream()
-                .map(Comment::getId)
-                .collect(Collectors.toList());
-        if (!commentIds.isEmpty()) {
-            subCommentMapper.update(null, new LambdaUpdateWrapper<SubComment>()
-                    .in(SubComment::getCommentId, commentIds)
-                    .eq(SubComment::getStatus, 1)
-                    .set(SubComment::getStatus, 0));
+        List<Long> commentIds = commentMapper.selectList( // 查这条帖子下的所有评论
+                        new LambdaQueryWrapper<Comment>().eq(Comment::getPostId, id) // 条件：post_id = 当前帖子
+                ).stream() // 转成流
+                .map(Comment::getId) // 只取评论 ID
+                .collect(Collectors.toList()); // 收集成 List
+        if (!commentIds.isEmpty()) { // 如果有评论
+            subCommentMapper.update(null, new LambdaUpdateWrapper<SubComment>() // 更新子评论
+                    .in(SubComment::getCommentId, commentIds) // 属于这些评论的子评论
+                    .eq(SubComment::getStatus, 1) // 只处理正常的
+                    .set(SubComment::getStatus, 0)); // 软删除：状态改成 0
         }
-        commentMapper.update(null, new LambdaUpdateWrapper<Comment>()
-                .eq(Comment::getPostId, id)
-                .eq(Comment::getStatus, 1) //这个是设计的逻辑删除，用来备份
-                .set(Comment::getStatus, 0));
+        commentMapper.update(null, new LambdaUpdateWrapper<Comment>() // 更新一级评论
+                .eq(Comment::getPostId, id) // 属于这条帖子
+                .eq(Comment::getStatus, 1) // 只处理正常的
+                .set(Comment::getStatus, 0)); // 软删除：状态改成 0
 
-        this.removeById(id);
-        evictFeedCache();
+        this.removeById(id); // 物理删除 post 表里的这条说说
+        // 事务提交后只删单条快照；随机页里残留的旧 ID 不用管：
+        // 读请求 MGET 不到快照、查库也查不到，会自动跳过；60 秒重建时自然清理。
+        afterCommit(() -> feedPoolService.evictPost(id));
     }
 
     @Override
-    public void evictFeedCache() {
-        stringRedisTemplate.delete(RedisConstants.FEED_POST_LATEST);
+    public void evictFeedPost(int postId) { // 供点赞/评论服务调用
+        feedPoolService.evictPost(postId); // 只删这一条帖子的内容缓存
     }
 
-    private List<PostVO> readCache(String json) {
-        if (json == null) {
-            return null;
-        }
-        try {
-//            return objectMapper.readValue(json, new TypeReference<List<PostVO>>() {
-//            });
-
-            //这个我更习惯用 hutool 工具包中的 工具，因为写起来更简单
-            List<PostVO> list = JSONUtil.toList(json, PostVO.class);
-            return list;
-        } catch (Exception e) {
-            log.warn("解析说说大厅缓存失败，降级查库", e);
-            return null;
-        }
-    }
-
-    private void writeCache(List<PostVO> list, long ttl) {
-        try {
-            stringRedisTemplate.opsForValue().set(
-                    RedisConstants.FEED_POST_LATEST,
-                    objectMapper.writeValueAsString(list),
-                    ttl,
-                    TimeUnit.SECONDS
-            );
-        } catch (Exception e) {
-            log.warn("写入说说大厅缓存失败", e);
+    /**
+     * 事务提交后再执行；没有事务就立即执行。
+     */
+    private void afterCommit(Runnable action) { // 包装一个“提交后执行”的工具
+        if (TransactionSynchronizationManager.isSynchronizationActive()) { // 当前确实在事务里
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() { // 注册事务回调
+                @Override
+                public void afterCommit() { // 事务提交成功后
+                    action.run(); // 执行传进来的动作
+                }
+            });
+        } else { // 没有事务
+            action.run(); // 立即执行，避免什么都不做
         }
     }
-
 }
