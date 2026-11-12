@@ -80,6 +80,36 @@ public class User implements Serializable {
     private String bio;
 
     /**
+     * 角色：0-普通用户 1-管理员 2-超级管理员
+     */
+    @Schema(description = "角色：0-普通用户 1-管理员 2-超级管理员")
+    private Integer role;
+
+    /**
+     * 状态：0-正常 1-封禁
+     */
+    @Schema(description = "状态：0-正常 1-封禁")
+    private Integer status;
+
+    /**
+     * 封禁原因
+     */
+    @Schema(description = "封禁原因")
+    private String banReason;
+
+    /**
+     * 封禁时间
+     */
+    @Schema(description = "封禁时间")
+    private LocalDateTime bannedAt;
+
+    /**
+     * 解封时间，NULL 表示永久
+     */
+    @Schema(description = "解封时间，NULL 表示永久")
+    private LocalDateTime bannedUntil;
+
+    /**
      * 最后在线时间，WebSocket 断连时更新
      */
     @Schema(description = "最后在线时间")

@@ -23,4 +23,9 @@ public class GlobalExceptionHandler {
     public Result<Void> handleBusiness(RuntimeException e) {
         return Result.error(e.getMessage());
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public Result<Void> handleIllegalArgument(IllegalArgumentException e) {
+        return Result.error(e.getMessage() == null ? "请求参数有误" : e.getMessage());
+    }
 }

@@ -89,6 +89,36 @@ public class Product implements Serializable {
     private Integer status;
 
     /**
+     * 审核状态：0-待审核 1-通过 2-驳回/封禁
+     */
+    @Schema(description = "审核状态：0-待审核 1-通过 2-驳回/封禁")
+    private Integer auditStatus;
+
+    /**
+     * 审核备注/驳回原因
+     */
+    @Schema(description = "审核备注/驳回原因")
+    private String auditRemark;
+
+    /**
+     * 审核人 user.id
+     */
+    @Schema(description = "审核人 user.id")
+    private Integer auditedBy;
+
+    /**
+     * 审核时间
+     */
+    @Schema(description = "审核时间")
+    private LocalDateTime auditedAt;
+
+    /**
+     * 管理员下架/封禁原因
+     */
+    @Schema(description = "管理员下架/封禁原因")
+    private String offlineReason;
+
+    /**
      * 发布时间
      */
     @Schema(description = "发布时间")

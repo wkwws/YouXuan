@@ -2,6 +2,8 @@ package com.example.secondhand_project.interceptor;
 
 import com.example.secondhand_project.conf.JwtConf;
 import com.example.secondhand_project.context.BaseContext;
+import com.example.secondhand_project.mapper.UserMapper;
+import com.example.secondhand_project.pojo.entity.User;
 import com.example.secondhand_project.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +17,9 @@ public class interceptor implements HandlerInterceptor {
 
     @Autowired
     private JwtConf jwtConf;
+
+    @Autowired
+    private UserMapper userMapper;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -57,6 +62,22 @@ public class interceptor implements HandlerInterceptor {
                 return true;
             }
             response.setStatus(401);
+            return false;
+        }
+
+        User user = userMapper.selectById(((Number) id).intValue());
+        if (user == null) {
+            if (publicGet) {
+                return true;
+            }
+            response.setStatus(401);
+            return false;
+        }
+        if (user.getStatus() != null && user.getStatus() == 1) {
+            response.setStatus(403);
+            response.setCharacterEncoding("UTF-8");
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().write("{\"code\":0,\"msg\":\"账号已被封禁\",\"data\":null}");
             return false;
         }
 

@@ -35,6 +35,7 @@ public class UsersServiceImpl extends ServiceImpl<UserMapper, User> implements I
         Page<Product> page = new Page<>(pagee.getPage(), pagee.getPageSize());
         Page<Product> page1 = iProductService.lambdaQuery()
                 .eq(Product::getUid, uid)
+                .ne(Product::getAuditStatus, 2)
                 .page(page);
 
         List<Product> records = page1.getRecords();
@@ -60,6 +61,8 @@ public class UsersServiceImpl extends ServiceImpl<UserMapper, User> implements I
 
         Page<Post> page1 = iPostService.lambdaQuery()
                 .eq(Post::getUid, uid)
+                .eq(Post::getVisible, 1)
+                .ne(Post::getAuditStatus, 2)
                 .page(page);
         List<Post> records = page1.getRecords();
         List<PostVO> collect = records.stream().map(post -> {

@@ -44,6 +44,11 @@ public class AuthServiceImpl  extends ServiceImpl<AuthMapper,User> implements Au
         if(!user.getPwd().equals(s)){
             throw new LoginException("密码错误");
         }
+        if (user.getStatus() != null && user.getStatus() == 1) {
+            String reason = user.getBanReason() == null || user.getBanReason().isBlank()
+                    ? "账号已被封禁" : "账号已被封禁：" + user.getBanReason();
+            throw new LoginException(reason);
+        }
         //如果密码正确，就可以返回值了
 
         return user;

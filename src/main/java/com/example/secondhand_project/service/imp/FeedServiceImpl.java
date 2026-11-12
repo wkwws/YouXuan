@@ -202,6 +202,12 @@ public class FeedServiceImpl implements IFeedService { // 实现随机 Feed 接�
 
         if (!missing.isEmpty()) { // 有没命中的
             List<Post> posts = postService.listByIds(missing); // 批量查数据库
+            if (posts != null) { // 查到了；过滤掉刚被隐藏/驳回的帖子
+                posts = posts.stream()
+                        .filter(post -> post.getVisible() == null || post.getVisible() == 1)
+                        .filter(post -> post.getAuditStatus() == null || post.getAuditStatus() != 2)
+                        .collect(Collectors.toList());
+            }
             if (posts != null && !posts.isEmpty()) { // 查到了
                 Map<Integer, User> users = loadUsers(posts.stream() // 收集作者 ID
                         .map(Post::getUid) // 只取 uid
@@ -286,6 +292,8 @@ public class FeedServiceImpl implements IFeedService { // 实现随机 Feed 接�
         try { // 正常查
             int fetch = Math.max(size * 20, 200); // 一次最多查多少条，至少 200
             List<Post> posts = postService.lambdaQuery() // 用 MyBatis-Plus 查
+                    .eq(Post::getVisible, 1) // 隐藏的不进 Feed
+                    .ne(Post::getAuditStatus, 2) // 驳回的不进 Feed
                     .orderByDesc(Post::getCreatedAt) // 按时间倒序
                     .last("LIMIT " + fetch) // 只取最近 fetch 条
                     .list(); // 执行

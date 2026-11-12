@@ -24,6 +24,7 @@ public interface PostMapper extends BaseMapper<Post> { // 继承基础 Mapper，
      */
     @Select("SELECT id, like_count AS likeCount, created_at AS createdAt " + // 只查三个字段：ID、点赞数、发布时间
             "FROM post WHERE created_at >= #{since} " + // 只拿最近 N 天的帖子
+            "AND visible = 1 AND audit_status <> 2 " + // 隐藏/驳回的不进随机池
             "ORDER BY created_at DESC LIMIT #{limit}") // 按时间倒序，最多拿 limit 条
     List<FeedCandidate> selectFeedCandidates(@Param("since") LocalDateTime since, // 时间下限
                                              @Param("limit") int limit); // 最多查多少条
@@ -32,6 +33,7 @@ public interface PostMapper extends BaseMapper<Post> { // 继承基础 Mapper，
      * 全量最新候选：小站最近 N 天不足一页时兜底，避免 Feed 为空。
      */
     @Select("SELECT id, like_count AS likeCount, created_at AS createdAt " + // 同样只查三个字段
-            "FROM post ORDER BY created_at DESC LIMIT #{limit}") // 不限制时间，直接拿最新 limit 条
+            "FROM post WHERE visible = 1 AND audit_status <> 2 " + // 隐藏/驳回的不进随机池
+            "ORDER BY created_at DESC LIMIT #{limit}") // 不限制时间，直接拿最新 limit 条
     List<FeedCandidate> selectRecentCandidates(@Param("limit") int limit); // 最多查多少条
 }

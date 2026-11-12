@@ -12,7 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
-@MapperScan("com.example.secondhand_project.mapper")
+@MapperScan({"com.example.secondhand_project.mapper", "com.example.secondhand_project.admin.mapper"})
 public class SecondhandProjectApplication {
 
     public static void main(String[] args) {

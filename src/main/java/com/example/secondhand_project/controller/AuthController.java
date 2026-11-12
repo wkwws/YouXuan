@@ -52,7 +52,6 @@ public class AuthController {
                 .Token(token)
                 .build();
         //返回数据
-        log.info("token:{}",token);
         return Result.success(l);
     }
     /**

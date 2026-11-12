@@ -66,6 +66,42 @@ public class Post implements Serializable {
     private Integer commentCount;
 
     /**
+     * 审核状态：0-待审核 1-通过 2-驳回/封禁
+     */
+    @TableField("audit_status")
+    private Integer auditStatus;
+
+    /**
+     * 是否可见：1-可见 0-隐藏
+     */
+    @TableField("visible")
+    private Integer visible;
+
+    /**
+     * 审核备注/驳回原因
+     */
+    @TableField("audit_remark")
+    private String auditRemark;
+
+    /**
+     * 管理员隐藏原因
+     */
+    @TableField("hidden_reason")
+    private String hiddenReason;
+
+    /**
+     * 审核人 user.id
+     */
+    @TableField("audited_by")
+    private Integer auditedBy;
+
+    /**
+     * 审核时间
+     */
+    @TableField("audited_at")
+    private LocalDateTime auditedAt;
+
+    /**
      * 发布时间
      */
     @TableField("created_at")
