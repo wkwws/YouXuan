@@ -37,11 +37,16 @@ secondhand:
     ttl-mills: 17000000
     user-token-name: Authorization
 
-  alioss:
-    endpoint: ${dev.alioss.endpoint}
-    access-key-id: ${dev.alioss.access-key-id}
-    access-key-secret: ${dev.alioss.access-key-secret}
-    bucket-name: ${dev.alioss.bucket-name}
+  # MinIO 对象存储（本地 Docker）
+  minio:
+    enabled: ${MINIO_ENABLED:true}
+    endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+    access-key: ${MINIO_ACCESS_KEY:LrtzlDDUiRmDts6YGK8u}
+    secret-key: ${MINIO_SECRET_KEY:4rbYFCTTg3F8Go6zpzVfCsZ1QyaVoy0f0a8djzzi}
+    bucket: ${MINIO_BUCKET:liuzhuanpin}
+    public-url: ${MINIO_PUBLIC_URL:http://localhost:9000}
+    max-image-size: ${MINIO_MAX_IMAGE_SIZE:10485760}
+    public-read: ${MINIO_PUBLIC_READ:true}
 
 # 说说随机 Feed：权重 = 基础分 + 时间衰减 + 点赞对数 + 新帖加成
 feed:
