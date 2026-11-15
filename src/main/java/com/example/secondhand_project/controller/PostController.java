@@ -1,6 +1,7 @@
 package com.example.secondhand_project.controller; // 控制器所在的包
 
 
+import com.example.secondhand_project.conf.FeedProperties; // 首页说说条数等 Feed 配置
 import com.example.secondhand_project.context.BaseContext; // 当前登录用户 ID
 import com.example.secondhand_project.pojo.dto.PostDTO; // 发布说说的请求体
 import com.example.secondhand_project.pojo.entity.Post; // 说说实体
@@ -39,6 +40,9 @@ public class PostController {
     @Autowired // 注入随机 Feed 服务
     private IFeedService feedService;
 
+    @Autowired // 注入 Feed 配置，用于读取首页默认说说条数
+    private FeedProperties feedProperties;
+
 
     /**
      * 添加说说
@@ -56,19 +60,19 @@ public class PostController {
 
 
     /**
-     * 随机获取说说：默认 10 条，可选 size 和 exclude。
+     * 随机获取说说：默认条数由 feed.size 配置，可选 size 和 exclude。
      *
      * <p>exclude 传上一批的 ID，用于“换一批”尽量不重复。</p>
      */
     @Operation(summary = "随机获取说说列表",
-            description = "按时间 + 点赞加权随机返回，默认 10 条；exclude 传上一批 ID 可减少重复")
+            description = "按时间 + 点赞加权随机返回，默认条数由 feed.size 配置；exclude 传上一批 ID 可减少重复")
     @GetMapping // GET /posts
     public Result<List<PostVO>> getpost(
-            @Parameter(description = "返回条数，默认 10，最大 20")
-            @RequestParam(value = "size", required = false, defaultValue = "10") Integer size, // 前端要几条
+            @Parameter(description = "返回条数，不传时使用 feed.size 配置；上限由 feed.max-size 控制")
+            @RequestParam(value = "size", required = false) Integer size, // 前端要几条，不传用配置默认值
             @Parameter(description = "上一批说说 ID，逗号分隔")
             @RequestParam(value = "exclude", required = false) String exclude) { // 上一批的 ID
-        int limit = size == null ? 10 : size; // size 没传就按 10 条
+        int limit = size == null ? feedProperties.getSize() : size; // 未指定时读取 feed.size
         return Result.success(feedService.randomFeed(limit, parseExclude(exclude))); // 随机取一页并返回
     }
 

@@ -14,11 +14,11 @@ import org.springframework.stereotype.Component; // 交给 Spring 管理
 @ConfigurationProperties(prefix = "feed") // 读取 application.yml 里以 feed 开头的配置
 public class FeedProperties {
 
-    /** 默认返回条数 */
-    private int size = 10; // 预留的默认条数；当前接口由 Controller 的 defaultValue=10 提供
+    /** 首页默认返回条数（GET /posts 未传 size 时使用） */
+    private int size = 30; // 改这里即可调整首页说说总量；需不大于 maxSize
 
     /** 单次最大返回条数 */
-    private int maxSize = 20; // 一次最多返回 20 条，防止前端传 size=99999 把服务器拖垮
+    private int maxSize = 30; // 一次最多返回 30 条，防止前端传 size=99999 把服务器拖垮
 
     /** 每个随机页的条数 */
     private int pageSize = 10; // 每一页放 10 个帖子 ID，和前端一次展示 10 条对应

@@ -65,7 +65,7 @@ public class FeedServiceImpl implements IFeedService { // 实现随机 Feed 接�
 
     @Override
     public List<PostVO> randomFeed(int size, List<Integer> exclude) { // 随机 Feed 主流程
-        int limit = Math.min(Math.max(size, 1), Math.max(1, feedProperties.getMaxSize())); // 把条数夹在 1~20 之间
+        int limit = Math.min(Math.max(size, 1), Math.max(1, feedProperties.getMaxSize())); // 把条数夹在 1~feed.max-size 之间
         Set<Integer> excluded = exclude == null // 如果前端没传 exclude
                 ? Collections.emptySet() // 就用空集合
                 : exclude.stream() // 否则把 List 转成流
@@ -206,6 +206,7 @@ public class FeedServiceImpl implements IFeedService { // 实现随机 Feed 接�
                 posts = posts.stream()
                         .filter(post -> post.getVisible() == null || post.getVisible() == 1)
                         .filter(post -> post.getAuditStatus() == null || post.getAuditStatus() != 2)
+                        .filter(post-> post.getAuditStatus() == null || post.getAuditStatus() != 0)
                         .collect(Collectors.toList());
             }
             if (posts != null && !posts.isEmpty()) { // 查到了
@@ -293,7 +294,7 @@ public class FeedServiceImpl implements IFeedService { // 实现随机 Feed 接�
             int fetch = Math.max(size * 20, 200); // 一次最多查多少条，至少 200
             List<Post> posts = postService.lambdaQuery() // 用 MyBatis-Plus 查
                     .eq(Post::getVisible, 1) // 隐藏的不进 Feed
-                    .ne(Post::getAuditStatus, 2) // 驳回的不进 Feed
+                    .notIn(Post::getAuditStatus, 0,2)// 驳回或者未审核的不进 Feed
                     .orderByDesc(Post::getCreatedAt) // 按时间倒序
                     .last("LIMIT " + fetch) // 只取最近 fetch 条
                     .list(); // 执行
