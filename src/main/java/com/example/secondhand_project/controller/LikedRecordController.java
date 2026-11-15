@@ -1,5 +1,6 @@
 package com.example.secondhand_project.controller;
 
+import com.example.secondhand_project.annotation.RateLimit;
 import com.example.secondhand_project.enums.LikeBizTypeEnum;
 import com.example.secondhand_project.pojo.dto.LikeRecordFormDTO;
 import com.example.secondhand_project.result.Result;
@@ -37,6 +38,8 @@ public class LikedRecordController {
             summary = "点赞或取消点赞",
             description = "liked=true 点赞，liked=false 取消点赞；重复操作幂等，返回当前点赞总数"
     )
+    @RateLimit(count = 30, window = 60, key = "like:toggle",
+            message = "点赞操作过于频繁，请稍后再试")
     @PostMapping
     public Result<Long> addordeleteRecord(@Valid @RequestBody LikeRecordFormDTO likeRecordFormDTO) {
         return Result.success(likedRecordService.addordeleteRecord(likeRecordFormDTO));

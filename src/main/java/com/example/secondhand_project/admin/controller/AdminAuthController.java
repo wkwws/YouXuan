@@ -1,6 +1,8 @@
 package com.example.secondhand_project.admin.controller;
 
 import com.example.secondhand_project.admin.service.AdminAuthService;
+import com.example.secondhand_project.annotation.RateLimit;
+import com.example.secondhand_project.enums.RateLimitDimension;
 import com.example.secondhand_project.result.Result;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,6 +26,8 @@ public class AdminAuthController {
     }
 
     @Operation(summary = "管理员登录")
+    @RateLimit(count = 5, window = 60, dimension = RateLimitDimension.IP,
+            key = "admin:auth:login", message = "登录尝试过于频繁，请稍后再试")
     @PostMapping("/login")
     public Result<Map<String, Object>> login(@RequestBody Map<String, String> body) {
         return Result.success(adminAuthService.login(body.get("username"), body.get("password")));

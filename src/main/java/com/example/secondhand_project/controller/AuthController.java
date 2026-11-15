@@ -1,7 +1,9 @@
 package com.example.secondhand_project.controller;
 
+import com.example.secondhand_project.annotation.RateLimit;
 import com.example.secondhand_project.conf.JwtConf;
 import com.example.secondhand_project.context.BaseContext;
+import com.example.secondhand_project.enums.RateLimitDimension;
 import com.example.secondhand_project.pojo.dto.LoginDTO;
 import com.example.secondhand_project.pojo.entity.User;
 import com.example.secondhand_project.pojo.vo.LoginVO;
@@ -35,6 +37,8 @@ public class AuthController {
      * @return
      */
     @Operation(summary = "用户登录", description = "使用用户名和密码登录，返回 JWT Token 和用户信息")
+    @RateLimit(count = 10, window = 60, dimension = RateLimitDimension.IP,
+            key = "auth:login", message = "登录尝试过于频繁，请稍后再试")
     @PostMapping("/login")
     public Result login(@RequestBody LoginDTO loginDTO) {
         //密码的判断并返回User实体类对象
@@ -60,6 +64,8 @@ public class AuthController {
      * @return
      */
     @Operation(summary = "用户注册", description = "注册新用户，用户名和密码必填")
+    @RateLimit(count = 5, window = 300, dimension = RateLimitDimension.IP,
+            key = "auth:register", message = "注册过于频繁，请稍后再试")
     @PostMapping("/register")
     public Result register(@RequestBody LoginDTO loginDTO) {
 

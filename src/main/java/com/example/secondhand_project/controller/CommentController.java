@@ -1,5 +1,6 @@
 package com.example.secondhand_project.controller;
 
+import com.example.secondhand_project.annotation.RateLimit;
 import com.example.secondhand_project.pojo.dto.CommentDTO;
 import com.example.secondhand_project.pojo.dto.SubCommentDTO;
 import com.example.secondhand_project.pojo.vo.CommentVO;
@@ -46,6 +47,8 @@ public class CommentController {
     }
 
     @Operation(summary = "发布一级评论", description = "需登录，内容最长500字")
+    @RateLimit(count = 10, window = 60, key = "comment:create",
+            message = "评论过于频繁，请稍后再试")
     @PostMapping("/posts/{postId}/comments")
     public Result<CommentVO> addComment(
             @PathVariable int postId,
@@ -63,6 +66,8 @@ public class CommentController {
     }
 
     @Operation(summary = "发布子评论 / 回复", description = "需登录，可选 replySubId 指定回复哪条子评论")
+    @RateLimit(count = 15, window = 60, key = "comment:reply",
+            message = "回复过于频繁，请稍后再试")
     @PostMapping("/comments/{commentId}/replies")
     public Result<SubCommentVO> addReply(
             @PathVariable long commentId,

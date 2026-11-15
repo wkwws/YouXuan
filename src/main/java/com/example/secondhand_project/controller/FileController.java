@@ -1,5 +1,6 @@
 package com.example.secondhand_project.controller;
 
+import com.example.secondhand_project.annotation.RateLimit;
 import com.example.secondhand_project.pojo.vo.FileVO;
 import com.example.secondhand_project.result.Result;
 import com.example.secondhand_project.service.imp.MinioStorageService;
@@ -24,6 +25,8 @@ public class FileController {
     }
 
     @Operation(summary = "上传图片", description = "上传图片到 MinIO，返回可直接展示的 URL（需登录）")
+    @RateLimit(count = 10, window = 60, key = "upload:image",
+            message = "上传过于频繁，请稍后再试")
     @PostMapping
     public Result<FileVO> upload(
             @Parameter(description = "上传的图片") @RequestParam("file") MultipartFile file) {

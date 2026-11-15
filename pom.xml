@@ -36,6 +36,12 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!-- AOP：@Aspect 织入支持（限流切面） -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+
         <!-- 参数校验：@Valid / @NotNull（点赞表单使用） -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

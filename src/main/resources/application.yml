@@ -65,6 +65,8 @@ feed:
   snapshot-ttl-seconds: 300 # 单条说说内容缓存 5 分钟
   snapshot-ttl-random: 60 # 再随机加 0~60 秒，避免大量缓存同时过期
 
-
+# 接口限流：注解生效；设为 false 时切面不处理任何请求（便于测试/压测）
+rate-limit:
+  enabled: true
 
 

@@ -37,4 +37,9 @@ public class RedisConstants { // 集中管理 Redis key，避免代码里到处�
     /** 待同步的点赞计数 ZSet：like:record:count:{bizType} */
     public static final String LIKE_RECORD_COUNT = "like:record:count:"; // 还没落库的点赞数
 
+    // ==================== 接口限流 ====================
+
+    /** 限流 ZSET 的前缀：rate_limit:{接口标识}:{身份标识} */
+    public static final String RATE_LIMIT_KEY = "rate_limit:";
+
 }

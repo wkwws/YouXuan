@@ -1,6 +1,7 @@
 package com.example.secondhand_project.controller; // 控制器所在的包
 
 
+import com.example.secondhand_project.annotation.RateLimit; // 接口限流注解
 import com.example.secondhand_project.conf.FeedProperties; // 首页说说条数等 Feed 配置
 import com.example.secondhand_project.context.BaseContext; // 当前登录用户 ID
 import com.example.secondhand_project.pojo.dto.PostDTO; // 发布说说的请求体
@@ -50,6 +51,8 @@ public class PostController {
      * @param post 说说内容
      */
     @Operation(summary = "发布说说", description = "发布一条校园生活说说（需登录）") // Swagger 说明
+    @RateLimit(count = 5, window = 60, key = "post:create",
+            message = "发帖过于频繁，请稍后再试") // 同一用户 60 秒内最多发 5 条
     @PostMapping() // POST /posts
     public Result addpost(@RequestBody PostDTO post) { // 前端传来的 content/images
 
@@ -103,6 +106,8 @@ public class PostController {
      * 删除说说
      */
     @Operation(summary = "删除说说", description = "根据 ID 删除说说（需登录，仅自己的说说）") // Swagger 说明
+    @RateLimit(count = 10, window = 60, key = "post:delete",
+            message = "操作过于频繁，请稍后再试") // 同一用户 60 秒内最多删 10 条
     @DeleteMapping("/{id}") // DELETE /posts/{id}
     public Result deletepost(@Parameter(description = "说说 ID") @PathVariable int id) { // 路径里的说说 ID
 

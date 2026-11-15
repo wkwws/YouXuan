@@ -1,6 +1,7 @@
 package com.example.secondhand_project.controller;
 
 
+import com.example.secondhand_project.annotation.RateLimit;
 import com.example.secondhand_project.context.BaseContext;
 import com.example.secondhand_project.pojo.dto.ProductDTO;
 import com.example.secondhand_project.pojo.entity.Pagee;
@@ -39,6 +40,8 @@ public class ProductController {
      * @return
      */
     @Operation(summary = "添加商品", description = "发布一个新的二手商品（需登录）")
+    @RateLimit(count = 5, window = 60, key = "product:create",
+            message = "发布商品过于频繁，请稍后再试")
     @PostMapping()
     public Result addProduct(@RequestBody ProductDTO productDTO){
 
@@ -80,6 +83,8 @@ public class ProductController {
      * @return
      */
     @Operation(summary = "更新商品", description = "根据商品 ID 更新商品信息（需登录，仅自己的商品）")
+    @RateLimit(count = 10, window = 60, key = "product:update",
+            message = "操作过于频繁，请稍后再试")
     @PutMapping("/{id}")
     public Result updateproduct(@Parameter(description = "商品 ID") @PathVariable Integer id,
                                 @RequestBody ProductDTO productDTO){
@@ -103,6 +108,8 @@ public class ProductController {
      * @return
      */
     @Operation(summary = "删除商品", description = "根据商品 ID 删除商品（需登录，仅自己的商品）")
+    @RateLimit(count = 10, window = 60, key = "product:delete",
+            message = "操作过于频繁，请稍后再试")
     @DeleteMapping("/{id}")
     public Result deleteproduct(@Parameter(description = "商品 ID") @PathVariable Integer id){
 

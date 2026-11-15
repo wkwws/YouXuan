@@ -1,5 +1,6 @@
 package com.example.secondhand_project.controller;
 
+import com.example.secondhand_project.annotation.RateLimit;
 import com.example.secondhand_project.pojo.entity.Pagee;
 import com.example.secondhand_project.pojo.entity.Product;
 import com.example.secondhand_project.pojo.entity.User;
@@ -54,6 +55,8 @@ public class UserController {
      * @return
      */
     @Operation(summary = "更新当前用户信息", description = "更新当前登录用户的个人资料（需登录）")
+    @RateLimit(count = 5, window = 60, key = "user:update-profile",
+            message = "操作过于频繁，请稍后再试")
     @PutMapping("/profile")
     public Result updateuserinfo(@RequestBody User user){
 

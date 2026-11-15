@@ -3,6 +3,7 @@ package com.example.secondhand_project.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
+import com.example.secondhand_project.annotation.RateLimit;
 import com.example.secondhand_project.pojo.dto.ConvId;
 import com.example.secondhand_project.pojo.dto.MessageDTO;
 import com.example.secondhand_project.pojo.entity.Pagee;
@@ -36,7 +37,6 @@ public class MessageController {
     @Autowired
     private IMessageService iMessageService;
 
-
     /**
      * 发送消息
      * @param messageDTO
@@ -44,6 +44,8 @@ public class MessageController {
      * @return
      */
     @Operation(summary = "发送消息", description = "向指定用户发送一条私信消息（需登录）")
+    @RateLimit(count = 30, window = 60, key = "message:send",
+            message = "发送消息过于频繁，请稍后再试")
     @PostMapping("/{userId}")
     public Result addmessage(@RequestBody MessageDTO messageDTO,
                              @Parameter(description = "接收方用户 ID") @PathVariable String userId){
