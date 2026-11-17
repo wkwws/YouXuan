@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="340" viewBox="0 0 1200 340" fill="none" role="img" aria-label="校园二手交易平台">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="340" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B1120"/>
+      <stop offset="0.55" stop-color="#171A3A"/>
+      <stop offset="1" stop-color="#2E1065"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#818CF8"/>
+      <stop offset="1" stop-color="#22D3EE"/>
+    </linearGradient>
+    <radialGradient id="glowA" cx="0.5" cy="0.5" r="0.5">
+      <stop stop-color="#6366F1" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#6366F1" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowB" cx="0.5" cy="0.5" r="0.5">
+      <stop stop-color="#22D3EE" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#22D3EE" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="340" fill="url(#bg)"/>
+  <circle cx="1010" cy="20" r="280" fill="url(#glowA)"/>
+  <circle cx="1140" cy="320" r="220" fill="url(#glowB)"/>
+
+  <g stroke="#FFFFFF" stroke-opacity="0.045">
+    <path d="M0 60H1200M0 120H1200M0 180H1200M0 240H1200M0 300H1200"/>
+    <path d="M60 0V340M180 0V340M300 0V340M420 0V340M540 0V340M660 0V340M780 0V340M900 0V340M1020 0V340M1140 0V340"/>
+  </g>
+
+  <text x="72" y="88" fill="#A5B4FC" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="15" font-weight="600" letter-spacing="3.5">CAMPUS · SECOND-HAND · COMMUNITY</text>
+  <text x="72" y="158" fill="#FFFFFF" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="52" font-weight="700">校园二手交易平台</text>
+  <text x="72" y="200" fill="#CBD5E1" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="19">让闲置流动起来，让同校交易更近一点。</text>
+
+  <g font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="14" fill="#E2E8F0">
+    <rect x="72" y="238" width="156" height="36" rx="18" fill="#FFFFFF" fill-opacity="0.07" stroke="#FFFFFF" stroke-opacity="0.16"/>
+    <text x="90" y="261">Spring Boot 3.3</text>
+    <rect x="240" y="238" width="80" height="36" rx="18" fill="#FFFFFF" fill-opacity="0.07" stroke="#FFFFFF" stroke-opacity="0.16"/>
+    <text x="258" y="261">Vue 3</text>
+    <rect x="332" y="238" width="80" height="36" rx="18" fill="#FFFFFF" fill-opacity="0.07" stroke="#FFFFFF" stroke-opacity="0.16"/>
+    <text x="350" y="261">Redis</text>
+    <rect x="424" y="238" width="110" height="36" rx="18" fill="#FFFFFF" fill-opacity="0.07" stroke="#FFFFFF" stroke-opacity="0.16"/>
+    <text x="442" y="261">RabbitMQ</text>
+    <rect x="546" y="238" width="120" height="36" rx="18" fill="#FFFFFF" fill-opacity="0.07" stroke="#FFFFFF" stroke-opacity="0.16"/>
+    <text x="564" y="261">WebSocket</text>
+    <rect x="678" y="238" width="86" height="36" rx="18" fill="#FFFFFF" fill-opacity="0.07" stroke="#FFFFFF" stroke-opacity="0.16"/>
+    <text x="696" y="261">MinIO</text>
+  </g>
+
+  <g>
+    <rect x="846" y="58" width="282" height="224" rx="22" fill="#0B1120" fill-opacity="0.55" stroke="#FFFFFF" stroke-opacity="0.14"/>
+    <circle cx="872" cy="84" r="5" fill="#F87171"/>
+    <circle cx="890" cy="84" r="5" fill="#FBBF24"/>
+    <circle cx="908" cy="84" r="5" fill="#34D399"/>
+
+    <rect x="872" y="106" width="230" height="34" rx="10" fill="#FFFFFF" fill-opacity="0.06"/>
+    <text x="888" y="128" fill="#94A3B8" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="13">搜索同校好物...</text>
+
+    <rect x="872" y="156" width="108" height="86" rx="12" fill="url(#accent)" fill-opacity="0.85"/>
+    <rect x="994" y="156" width="108" height="40" rx="10" fill="#FFFFFF" fill-opacity="0.08"/>
+    <rect x="994" y="204" width="84" height="12" rx="6" fill="#FFFFFF" fill-opacity="0.25"/>
+    <rect x="994" y="224" width="60" height="12" rx="6" fill="#FFFFFF" fill-opacity="0.16"/>
+    <rect x="872" y="256" width="150" height="12" rx="6" fill="#FFFFFF" fill-opacity="0.2"/>
+    <rect x="872" y="276" width="110" height="12" rx="6" fill="#FFFFFF" fill-opacity="0.12"/>
+
+    <g>
+      <rect x="1000" y="238" width="150" height="58" rx="16" fill="#22D3EE" fill-opacity="0.16" stroke="#22D3EE" stroke-opacity="0.35"/>
+      <text x="1018" y="262" fill="#A5F3FC" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="12">同学，还在吗？</text>
+      <text x="1018" y="282" fill="#67E8F9" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="11">WebSocket 实时送达</text>
+    </g>
+  </g>
+</svg>

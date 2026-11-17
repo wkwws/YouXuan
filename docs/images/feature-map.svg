@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560" viewBox="0 0 1200 560" fill="none" role="img" aria-label="项目核心能力">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="560" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B1120"/>
+      <stop offset="1" stop-color="#111827"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop stop-color="#6366F1" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#6366F1" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="560" fill="url(#bg)"/>
+  <circle cx="1040" cy="40" r="300" fill="url(#glow)"/>
+
+  <text x="50" y="62" fill="#FFFFFF" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="30" font-weight="700">核心能力</text>
+  <text x="50" y="94" fill="#94A3B8" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="15">从内容生产到实时互动，再到后台治理，一条完整的校园交易链路。</text>
+
+  <!-- Row 1 -->
+  <g>
+    <rect x="50" y="130" width="340" height="170" rx="18" fill="#111827" stroke="#1F2937"/>
+    <circle cx="100" cy="180" r="22" fill="#818CF8" fill-opacity="0.14"/>
+    <g transform="translate(100 180)" stroke="#818CF8" stroke-width="2" stroke-linecap="round">
+      <rect x="-9" y="-9" width="18" height="18" rx="3"/>
+      <path d="M-5-4H5M-5 0H5M-5 4H2"/>
+    </g>
+    <text x="134" y="187" fill="#FFFFFF" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="20" font-weight="600">校园生活圈</text>
+    <text x="78" y="232" fill="#94A3B8" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="14">加权随机 Feed + 内容快照缓存</text>
+    <text x="78" y="256" fill="#94A3B8" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="14">MGET 批量读取，换一批少重复</text>
+    <text x="78" y="280" fill="#64748B" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="12">Redis · 定时重建 · 权重衰减</text>
+  </g>
+
+  <g>
+    <rect x="430" y="130" width="340" height="170" rx="18" fill="#111827" stroke="#1F2937"/>
+    <circle cx="480" cy="180" r="22" fill="#F472B6" fill-opacity="0.14"/>
+    <g transform="translate(480 180)" stroke="#F472B6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M-8-4H8L10 10H-10L-8-4Z"/>
+      <path d="M-4-4V-7A4 4 0 0 1 4-7V-4"/>
+    </g>
+    <text x="514" y="187" fill="#FFFFFF" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="20" font-weight="600">二手商品</text>
+    <text x="458" y="232" fill="#94A3B8" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="14">分类分页、发布编辑、上下架</text>
+    <text x="458" y="256" fill="#94A3B8" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="14">MinIO 图片上传与审核联动</text>
+    <text x="458" y="280" fill="#64748B" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="12">MyBatis-Plus · MinIO</text>
+  </g>
+
+  <g>
+    <rect x="810" y="130" width="340" height="170" rx="18" fill="#111827" stroke="#1F2937"/>
+    <circle cx="860" cy="180" r="22" fill="#FB7185" fill-opacity="0.14"/>
+    <g transform="translate(860 180)" stroke="#FB7185" stroke-width="2" stroke-linejoin="round">
+      <path d="M0 8C-2 5-9 1-9-4A5 5 0 0 1 0-6A5 5 0 0 1 9-4C9 1 2 5 0 8Z"/>
+    </g>
+    <text x="894" y="187" fill="#FFFFFF" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="20" font-weight="600">评论与点赞</text>
+    <text x="838" y="232" fill="#94A3B8" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="14">一级评论 / 子回复、点赞去重</text>
+    <text x="838" y="256" fill="#94A3B8" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="14">Redis Set / ZSet 计数 + 定时落库</text>
+    <text x="838" y="280" fill="#64748B" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="12">Pipeline · 幂等 · 削峰</text>
+  </g>
+
+  <!-- Row 2 -->
+  <g>
+    <rect x="50" y="330" width="340" height="170" rx="18" fill="#111827" stroke="#1F2937"/>
+    <circle cx="100" cy="380" r="22" fill="#22D3EE" fill-opacity="0.14"/>
+    <g transform="translate(100 380)" stroke="#22D3EE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="-10" y="-8" width="20" height="14" rx="4"/>
+      <path d="M-4 6L0 11L4 6"/>
+    </g>
+    <text x="134" y="387" fill="#FFFFFF" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="20" font-weight="600">实时私信</text>
+    <text x="78" y="432" fill="#94A3B8" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="14">REST 发送 + WebSocket 推送</text>
+    <text x="78" y="456" fill="#94A3B8" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="14">RabbitMQ 异步削峰，离线拉历史</text>
+    <text x="78" y="480" fill="#64748B" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="12">事务提交后投递 · 长连接</text>
+  </g>
+
+  <g>
+    <rect x="430" y="330" width="340" height="170" rx="18" fill="#111827" stroke="#1F2937"/>
+    <circle cx="480" cy="380" r="22" fill="#34D399" fill-opacity="0.14"/>
+    <g transform="translate(480 380)" stroke="#34D399" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M0-10L9-6V1C9 6 5 9 0 11C-5 9-9 6-9 1V-6L0-10Z"/>
+      <path d="M-4 0L-1 3L5-4"/>
+    </g>
+    <text x="514" y="387" fill="#FFFFFF" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="20" font-weight="600">管理后台</text>
+    <text x="458" y="432" fill="#94A3B8" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="14">审核队列、内容治理、数据看板</text>
+    <text x="458" y="456" fill="#94A3B8" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="14">用户 / 商品 / 说说 / 操作日志</text>
+    <text x="458" y="480" fill="#64748B" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="12">独立 JWT 鉴权 · 审核留痕</text>
+  </g>
+
+  <g>
+    <rect x="810" y="330" width="340" height="170" rx="18" fill="#111827" stroke="#1F2937"/>
+    <circle cx="860" cy="380" r="22" fill="#FBBF24" fill-opacity="0.14"/>
+    <g transform="translate(860 380)" stroke="#FBBF24" stroke-width="2" stroke-linecap="round">
+      <path d="M-9 4A9 9 0 0 1 9 4"/>
+      <path d="M0 4L5-2"/>
+      <circle cx="0" cy="4" r="1.5" fill="#FBBF24" stroke="none"/>
+    </g>
+    <text x="894" y="387" fill="#FFFFFF" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="20" font-weight="600">接口限流</text>
+    <text x="838" y="432" fill="#94A3B8" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="14">Redis ZSET + Lua 原子滑动窗口</text>
+    <text x="838" y="456" fill="#94A3B8" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="14">@RateLimit + AOP，14 个接口</text>
+    <text x="838" y="480" fill="#64748B" font-family="'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="12">429 · 用户 / IP 维度 · 故障放行</text>
+  </g>
+</svg>
