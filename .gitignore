@@ -34,3 +34,6 @@ build/
 
 # 忽略本地开发敏感配置
 application-dev.yml
+
+# 本地演示视频（完整视频放 GitHub Release，不提交到 git）
+*.mp4

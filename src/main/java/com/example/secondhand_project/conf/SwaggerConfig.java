@@ -35,8 +35,8 @@ public class SwaggerConfig {
 
         return new OpenAPI()
                 .info(new Info()
-                        .title("校园二手交易平台 API")
-                        .description("第二校园二手交易平台的后端接口文档，支持在线调试")
+                        .title("优选生活 API")
+                        .description("优选生活（校园二手交易与生活圈平台）的后端接口文档，支持在线调试")
                         .version("1.0.0")
                         .contact(new Contact()
                                 .name("wkw")

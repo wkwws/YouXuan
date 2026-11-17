@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="docs/images/banner.svg" alt="校园二手交易平台" width="100%" />
+  <img src="docs/images/banner.svg" alt="优选生活" width="100%" />
   <br/><br/>
 
   ![Java](https://img.shields.io/badge/Java-17-ED8B00?style=flat-square&logo=openjdk&logoColor=white)
@@ -22,7 +22,7 @@
 
 ## 项目简介
 
-**校园二手交易平台**面向高校内的闲置交易与校园社交场景。学生可以发布二手商品、在校园生活圈里发说说、评论点赞、私信聊天；管理员可以在后台完成内容审核、用户管理与运营查看。
+**优选生活**面向高校内的闲置交易与校园社交场景。学生可以发布二手商品、在校园生活圈里发说说、评论点赞、私信聊天；管理员可以在后台完成内容审核、用户管理与运营查看。
 
 项目采用**前后端分离**架构：后端以 Spring Boot 3 为核心，前端使用 Vue 3 + Element Plus。除了常规 CRUD，项目重点打磨了四条工程链路：
 
@@ -58,6 +58,12 @@
 ![商品详情](docs/images/product.png)
 ![实时私信](docs/images/chat.png)
 -->
+
+## 项目演示
+
+[![优选生活项目演示](docs/images/demo.gif)](https://github.com/wkwws/YouXuan/releases/download/v1.0-demo/demo.mp4)
+
+> 点击动图播放完整演示视频（GitHub Release，约 47 秒）：首页 Feed → 商品列表 → 商品详情 → 实时私信。
 
 ## 技术架构
 
