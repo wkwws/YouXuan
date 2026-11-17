@@ -46,24 +46,17 @@
 | 接口限流 | `@RateLimit` + AOP + Redis ZSET/Lua 滑动窗口，支持用户/IP 维度，超限 429，故障放行 |
 | 身份认证 | JWT + HandlerInterceptor + ThreadLocal，C 端与管理端鉴权隔离 |
 
-## 界面示意
+## 项目截图
 
-<img src="docs/images/ui-preview.svg" alt="界面示意" width="100%" />
+> 以下均为项目真实运行界面。
 
-> 上图为界面示意（UI Mockup），用于展示首页商品流与实时私信布局；实际页面以运行效果为准。
-
-<!--
-有真实截图时，建议放在 docs/images/ 下，并把示意替换为：
-![首页](docs/images/home.png)
-![商品详情](docs/images/product.png)
-![实时私信](docs/images/chat.png)
--->
-
-## 项目演示
-
-[![优选生活项目演示](docs/images/demo.gif)](https://github.com/wkwws/YouXuan/releases/download/v1.0-demo/demo.mp4)
-
-> 点击动图播放完整演示视频（GitHub Release，约 47 秒）：首页 Feed → 商品列表 → 商品详情 → 实时私信。
+| 首页 | 商品列表 |
+|:---:|:---:|
+| ![首页](docs/images/screenshots/home.png) | ![商品列表](docs/images/screenshots/products.png) |
+| **校园说说** | **消息列表** |
+| ![校园说说](docs/images/screenshots/feed.png) | ![消息列表](docs/images/screenshots/messages.png) |
+| **聊天会话** | **登录界面** |
+| ![聊天会话](docs/images/screenshots/chat.png) | ![登录界面](docs/images/screenshots/login.png) |
 
 ## 技术架构
 
