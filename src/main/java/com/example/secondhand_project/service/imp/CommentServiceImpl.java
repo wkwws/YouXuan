@@ -21,6 +21,7 @@ import com.example.secondhand_project.pojo.vo.PageVO;
 import com.example.secondhand_project.pojo.vo.SubCommentVO;
 import com.example.secondhand_project.service.ICommentService;
 import com.example.secondhand_project.service.ILikedRecordService;
+import com.example.secondhand_project.service.INotificationService; // 评论/回复成功后生成互动通知
 import com.example.secondhand_project.service.IPostService;
 import com.example.secondhand_project.service.IUserService;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +57,8 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     private final IUserService userService;
 
     private final ILikedRecordService likedRecordService;
+
+    private final INotificationService notificationService; // 负责落库并通过 WebSocket 推送互动通知
 
     @Override
     public PageVO<CommentVO> pageComments(int postId, int page, int pageSize) {
@@ -158,6 +161,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
                 .setSql("comment_count = comment_count + 1")
                 .update();
         evictFeedPostAfterCommit(postId); // 评论数变了，事务提交后删这条帖子的快照
+        notificationService.notifyNewComment(post, comment); // 通知说说作者（自己评论自己不通知）
 
         User author = userService.getById(uid.intValue());
         return CommentVO.builder()
@@ -249,6 +253,11 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
                 .setSql("comment_count = comment_count + 1")
                 .update();
         evictFeedPostAfterCommit(comment.getPostId()); // 回复数/评论数变了，事务提交后删快照
+
+        Post post = postService.getById(comment.getPostId()); // 查出说说，通知规则需要说说作者
+        if (post != null) { // 说说仍存在时才生成通知
+            notificationService.notifyNewReply(post, comment, sub); // 通知被回复者，并在需要时通知说说作者
+        }
 
         Set<Integer> ids = new HashSet<>();
         ids.add(uid.intValue());

@@ -16,4 +16,9 @@ public interface IFeedService {
      * @param exclude 当前这批的 ID，用于“换一批”尽量不重复
      */
     List<PostVO> randomFeed(int size, List<Integer> exclude); // 随机取一页，再把 ID 变成完整说说
+
+    /**
+     * 按 ID 获取一条可见的说说详情，供通知跳转使用。
+     */
+    PostVO getPost(int id); // 返回单条说说，不存在或不可见时返回 null
 }

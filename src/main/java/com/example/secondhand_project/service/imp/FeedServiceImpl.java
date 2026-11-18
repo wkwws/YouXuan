@@ -63,6 +63,22 @@ public class FeedServiceImpl implements IFeedService { // 实现随机 Feed 接�
 
     private final FeedProperties feedProperties; // 条数上限、快照 TTL 等参数
 
+    @Override // 实现按 ID 查询单条说说
+    public PostVO getPost(int id) { // 通知点击后通过该接口打开详情
+        Post post = postService.getById(id); // 按主键查询说说
+        if (post == null || (post.getVisible() != null && post.getVisible() != 1)) { // 说说不存在或已被隐藏
+            return null; // 不返回内容
+        }
+        if (post.getAuditStatus() != null // 审核状态不为空
+                && (post.getAuditStatus() == 0 || post.getAuditStatus() == 2)) { // 待审核或已驳回的说说不可见
+            return null; // 不返回内容
+        }
+        User author = userService.getById(post.getUid()); // 查询说说作者
+        List<PostVO> list = new ArrayList<>(); // 创建一个单元素列表以复用 fillLiked
+        list.add(toVO(post, author)); // 把实体转换为前端 VO
+        return fillLiked(list).get(0); // 补充当前用户的点赞状态后返回
+    }
+
     @Override
     public List<PostVO> randomFeed(int size, List<Integer> exclude) { // 随机 Feed 主流程
         int limit = Math.min(Math.max(size, 1), Math.max(1, feedProperties.getMaxSize())); // 把条数夹在 1~feed.max-size 之间

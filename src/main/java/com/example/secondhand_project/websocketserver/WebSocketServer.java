@@ -117,10 +117,13 @@ public class WebSocketServer {
     /**
      * 连接关闭
      */
-    @OnClose
-    public void onClose(@PathParam("userId") String sid) {
-        log.info("用户 {} 已断开", sid);
-        sessionMap.remove(sid);
+    @OnClose // 标记该方法在 WebSocket 连接关闭时执行
+    public void onClose(Session session, @PathParam("userId") String sid) { // 同时拿到关闭的会话和对应的用户 ID
+        // 只移除“当前这个连接”。重复登录时新连接已覆盖旧连接，
+        // 旧连接的关闭回调不能把新连接误删，否则用户会在线却收不到推送。
+        sessionMap.computeIfPresent(sid, (key, current) -> // 只有 key 仍存在时才执行删除判断
+                current.equals(session) ? null : current); // 当前值就是本次关闭的会话才删除，否则保留新会话
+        log.info("用户 {} 已断开", sid); // 记录断开日志
     }
 
     /**

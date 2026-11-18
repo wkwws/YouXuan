@@ -63,6 +63,19 @@ public class PostController {
 
 
     /**
+     * 按 ID 获取单条说说，供通知点击后打开详情。
+     */
+    @Operation(summary = "获取单条说说详情") // Swagger 接口说明
+    @GetMapping("/{id}") // 处理 GET /posts/{id}
+    public Result<PostVO> getPost(@Parameter(description = "说说 ID") @PathVariable int id) { // 路径中的说说 ID
+        PostVO post = feedService.getPost(id); // 查询可见的说说详情
+        if (post == null) { // 说说不存在、被隐藏或审核未通过
+            return Result.error("说说不存在或不可见"); // 返回业务错误
+        }
+        return Result.success(post); // 返回说说详情
+    }
+
+    /**
      * 随机获取说说：默认条数由 feed.size 配置，可选 size 和 exclude。
      *
      * <p>exclude 传上一批的 ID，用于“换一批”尽量不重复。</p>
